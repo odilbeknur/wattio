@@ -1,5 +1,5 @@
 {% load static %}
-<!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -128,137 +128,110 @@
   <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
 
   <script>
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
+    async function fetchData() {
+        const response = await fetch('/main/api/data/');
+        const data = await response.json();
+        return data;
+    }
 
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+    async function createChart() {
+        const data = await fetchData();
 
-    gradientStroke1.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(75, 192, 192, 0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(75, 192, 192, 0)'); // green colors
+        var ctx2 = document.getElementById("chart-line").getContext("2d");
 
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke1.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
+        gradientStroke1.addColorStop(0.2, 'rgba(75, 192, 192, 0.0)');
+        gradientStroke1.addColorStop(0, 'rgba(75, 192, 192, 0)'); 
 
-    gradientStroke2.addColorStop(1, 'rgba(255,165,0,0.2)'); // Light orange with 0.2 opacity
-    gradientStroke2.addColorStop(0.2, 'rgba(255,140,0,0.0)'); // Darker orange with 0 opacity
-    gradientStroke2.addColorStop(0, 'rgba(255,69,0,0)'); // Even darker orange with 0 opacity
+        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke2.addColorStop(1, 'rgba(255,165,0,0.2)'); 
+        gradientStroke2.addColorStop(0.2, 'rgba(255,140,0,0.0)'); 
+        gradientStroke2.addColorStop(0, 'rgba(255,69,0,0)');
 
-    
-    var gradientStroke3 = ctx2.createLinearGradient(0, 230, 0, 50);
+        var gradientStroke3 = ctx2.createLinearGradient(0, 230, 0, 50);
+        gradientStroke3.addColorStop(1, 'rgba(255, 0, 0, 0.2)'); 
+        gradientStroke3.addColorStop(0.2, 'rgba(255, 0, 0, 0.0)'); 
+        gradientStroke3.addColorStop(0, 'rgba(255, 0, 0, 0)');
 
-    gradientStroke3.addColorStop(1, 'rgba(255, 0, 0, 0.2)'); // Light red at the top
-    gradientStroke3.addColorStop(0.2, 'rgba(255, 0, 0, 0.0)'); // Transparent red in the middle
-    gradientStroke3.addColorStop(0, 'rgba(255, 0, 0, 0)'); // Fully transparent at the bottom
-
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["05:40", "06:00", "06:20", "06:40", "07:00", "07:20", "07:40", "08:00", "08:20", "08:40", 
-                "09:00", "09:20", "09:40", "10:00", "10:20", "10:40", "11:00", "11:20", "11:40", "12:00", 
-                "12:20", "12:40", "13:00", "13:20", "13:40", "14:00", "14:20", "14:40", "15:00", "15:20", 
-                "15:40", "16:00", "16:20", "16:40", "17:00", "17:20", "17:40", "18:00", "18:20", "18:40", 
-                "19:00", "19:20", "19:40", "20:00", "20:20", "20:40"],
-        datasets: [{
-            label: "IES",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#4bc0c0",
-            borderWidth: 3,
-            backgroundColor: gradientStroke1,
-            fill: true,
-            data: [0.05, 0.43, 0.82, 1.32, 2.03, 3.01, 4.95, 5.92, 8.63, 11.34, 12.32, 21.14, 22.34, 14.24, 20.47, 27.67, 28.33, 29.06, 29.55, 29.48, 27.19, 28.44, 31.06, 28.48, 28.54, 20.51, 26.95, 22.32, 23.76, 21.58, 18.86, 16.07, 12.14, 9.93, 8.46, 6.26, 4.11, 2.75, 2.16, 1.73, 1.42, 1.05, 0.65, 0.3, 0.06, 0.01],
-            maxBarThickness: 6
-
-          },
-          {
-            label: "Sozlash",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#F28C28",
-            borderWidth: 3,
-            backgroundColor: gradientStroke2,
-            fill: true,
-            data: [3.05, 3.43, 3.82, 4.32, 5.03, 6.01, 7.95, 8.92, 11.63, 14.34, 15.32, 24.14, 25.34, 17.24, 23.47, 30.67, 31.33, 32.06, 32.55, 32.48, 30.19, 31.44, 34.06, 31.48, 31.54, 23.51, 29.95, 25.32, 26.76, 24.58, 21.86, 19.07, 15.14, 12.93, 11.46, 9.26, 7.11, 5.75, 5.16, 4.73, 4.42, 4.05, 3.65, 3.3, 3.06, 3.01],
-            maxBarThickness: 6
-          },
-          /*{
-            label: "SolaX",
-            labels: ["05:40", "06:00", "06:20", "06:40", "07:00", "07:20", "07:40", "08:00", "08:20", "08:40", 
-                "09:00", "09:20", "09:40", "10:00", "10:20", "10:40", "11:00", "11:20", "11:40", "12:00", 
-                "12:20", "12:40", "13:00", "13:20", "13:40", "14:00", "14:20", "14:40", "15:00", "15:20", 
-                "15:40", "16:00", "16:20", "16:40", "17:00", "17:20", "17:40", "18:00", "18:20", "18:40", 
-                "19:00", "19:20", "19:40", "20:00", "20:20", "20:40"],
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#F41414",
-            borderWidth: 3,
-            backgroundColor: gradientStroke3,
-            fill: true,
-            data: [3.65, 2.05, 3.51, 4.85, 4.58, 6.52, 9.46, 9.67, 11.72, 12.2, 15.6, 24.07, 24.12, 17.9, 25.37, 28.84, 30.24, 32.17, 31.97, 32.04, 29.34, 31.62, 33.89, 32.19, 33.06, 21.69, 30.93, 24.17, 27.87, 23.71, 19.05, 21.01, 15.97, 13.71, 12.33, 7.79, 6.18, 6.35, 3.14, 3.8, 0.49, 2.39, 4.4, 4.37, 1.93, 5.5],
-            maxBarThickness: 6
-          },*/
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5]
+        new Chart(ctx2, {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "IES",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    borderColor: "#4bc0c0",
+                    borderWidth: 3,
+                    backgroundColor: gradientStroke1,
+                    fill: true,
+                    data: data.data, // Adjust according to your data format
+                    maxBarThickness: 6
+                }],
             },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#b2b9bf',
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#b2b9bf',
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#b2b9bf',
+                            padding: 20,
+                            font: {
+                                size: 11,
+                                family: "Open Sans",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
             },
-            ticks: {
-              display: true,
-              color: '#b2b9bf',
-              padding: 20,
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-  </script>
+        });
+    }
+
+    // Call the createChart function to create the chart
+    createChart();
+</script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
