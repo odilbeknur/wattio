@@ -1,16 +1,51 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
 import requests
 from django.http import JsonResponse
-from datetime import datetime, timedelta
-from collections import defaultdict
-
+from datetime import datetime
+from .decorators import login_required 
 # Create your views here.
 
+def login(request):
+    if 'access_token' in request.session:
+        return redirect('dashboard')  # Redirect to dashboard if already logged in
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Your FastAPI endpoint
+        ip = '10.40.9.118:8080'
+        url_auth = f"http://{ip}/user/signin"
+        data = {"username": username, "password": password}
+        response = requests.post(url_auth, data=data)
+
+        if response.status_code == 200:
+            token = response.json().get("access_token")
+            # Store the token in the session
+            request.session['access_token'] = token
+            return redirect('dashboard')  # Redirect to dashboard after successful login
+        else:
+            return HttpResponse("Login failed! Invalid credentials.")
+    
+    return render(request, 'main/sign-in.html')
+
+@login_required
+def monitor(request):
+    token = request.session.get('access_token')
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get('http://10.40.9.46:8080/inverter', headers=headers)
+    
+    if response.status_code == 401:  # Unauthorized
+        return redirect('login')
+    
+    query = response.json()
+    return render(request, 'main/home.html', {'query': query})
+
+@login_required
 def dashboard(request):
-     response = requests.get('http://10.40.9.46:8080/inverter')
-     query = response.json()
-     print(query)
-     return render(request, 'main/home.html', {'query':query})
+    return render(request, 'main/dashboard.html')
+
 
 # def baseview(request, pk):
 #     query = Device.objects.filter(category_id__id=pk)
@@ -29,7 +64,7 @@ def fetch_data_from_api(request):
 
 def process_data(data):
         
-    specific_date = datetime(2024, 7, 21)
+    specific_date = datetime(2024, 7, 18)
 
     time_values = [
     datetime.strptime(entry["create_date"], "%Y-%m-%dT%H:%M:%S.%f").strftime("%H:%M")

@@ -20,10 +20,65 @@
   <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'css/soft-ui-dashboard.css' %}" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-  
+  <div class="container position-sticky z-index-sticky top-0">
+    <div class="row">
+      <div class="col-12">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg blur blur-rounded top-0 z-index-3 shadow position-absolute my-3 py-2 start-0 end-0 mx-4">
+          <div class="container-fluid">
+            <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 " href="../pages/dashboard.html">
+              Soft UI Dashboard
+            </a>
+            <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon mt-2">
+                <span class="navbar-toggler-bar bar1"></span>
+                <span class="navbar-toggler-bar bar2"></span>
+                <span class="navbar-toggler-bar bar3"></span>
+              </span>
+            </button>
+            <div class="collapse navbar-collapse ps" id="navigation">
+              <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                  <a class="nav-link d-flex align-items-center me-2 active" aria-current="page" href="../pages/dashboard.html">
+                    <i class="fa fa-chart-pie opacity-6 text-dark me-1" aria-hidden="true"></i>
+                    Dashboard
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link me-2" href="../pages/profile.html">
+                    <i class="fa fa-user opacity-6 text-dark me-1" aria-hidden="true"></i>
+                    Profile
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link me-2" href="../pages/sign-up.html">
+                    <i class="fas fa-user-circle opacity-6 text-dark me-1" aria-hidden="true"></i>
+                    Sign Up
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link me-2" href="../pages/sign-in.html">
+                    <i class="fas fa-key opacity-6 text-dark me-1" aria-hidden="true"></i>
+                    Sign In
+                  </a>
+                </li>
+              </ul>
+              <ul class="navbar-nav d-lg-block d-none">
+                <li class="nav-item">
+                  <a href="https://www.creative-tim.com/product/soft-ui-dashboard" class="btn btn-sm btn-round mb-0 me-1 bg-gradient-dark">Free download</a>
+                </li>
+              </ul>
+            <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+          </div>
+        </nav>
+        <!-- End Navbar -->
+      </div>
+    </div>
+  </div>
   <!-- End Navbar -->
   <section class="min-vh-100 mb-8">
     <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg">
@@ -99,24 +154,27 @@
     </div>
     <div class="container mt-10">
       <div class="row mt-lg-n10 mt-md-n11 mt-n10">
-        <div class="col-xl-12 col-lg-5 col-md-7 mt-5 mx-auto">
-          <div class="card z-index-2">
-            <div class="card-header pb-0">
-              <h6>Power overview</h6>
-              <p class="text-sm">
-                <i class="fa fa-arrow-up text-success"></i>
-                <span class="font-weight-bold">Power line chart</span> in 2024
-              </p>
-            </div>
-            <div class="card-body p-3">
-              <div class="chart">
-                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+          <div class="col-xl-12 col-lg-5 col-md-7 mt-5 mx-auto">
+              <div class="card z-index-2">
+                  <div class="card-header pb-0">
+                      <h6>Power overview</h6>
+                      <p class="text-sm">
+                          <i class="fa fa-arrow-up text-success"></i>
+                          <span class="font-weight-bold">Power line chart</span> in 2024
+                      </p>
+                      <!-- Datepickers -->
+                      <input id="start-date" type="text" placeholder="Start Date">
+                  </div>
+                  <div class="card-body p-3">
+                      <div class="chart">
+                          <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+                      </div>
+                  </div>
               </div>
-            </div>
           </div>
-        </div>
       </div>
     </div>
+  
   </section>
  
   
@@ -126,38 +184,48 @@
   <script src="{% static 'js/plugins/perfect-scrollbar.min.js' %}"></script>
   <script src="{% static 'js/plugins/smooth-scrollbar.min.js' %}"></script>
   <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script>
-    async function fetchData() {
-        const response = await fetch('/main/api/data/');
+    // Initialize datepickers
+    flatpickr("#start-date", {
+        dateFormat: "Y-m-d",
+        onChange: fetchDataAndUpdateChart
+    });
+    
+    async function fetchData(startDate) {
+        const response = await fetch(`/main/api/data/?start=${startDate}`);
         const data = await response.json();
         return data;
     }
-
-    async function createChart() {
-        const data = await fetchData();
-
-        var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
+    
+    async function fetchDataAndUpdateChart() {
+        const startDate = document.getElementById('start-date').value;
+    
+        if (startDate) {
+            const data = await fetchData(startDate);
+            updateChart(data);
+        }
+    }
+    
+    let chartInstance;
+    
+    function updateChart(data) {
+        const ctx2 = document.getElementById("chart-line").getContext("2d");
+    
+        if (chartInstance) {
+            chartInstance.destroy(); // Destroy existing chart instance if it exists
+        }
+    
+        const gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
         gradientStroke1.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
         gradientStroke1.addColorStop(0.2, 'rgba(75, 192, 192, 0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(75, 192, 192, 0)'); 
-
-        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-        gradientStroke2.addColorStop(1, 'rgba(255,165,0,0.2)'); 
-        gradientStroke2.addColorStop(0.2, 'rgba(255,140,0,0.0)'); 
-        gradientStroke2.addColorStop(0, 'rgba(255,69,0,0)');
-
-        var gradientStroke3 = ctx2.createLinearGradient(0, 230, 0, 50);
-        gradientStroke3.addColorStop(1, 'rgba(255, 0, 0, 0.2)'); 
-        gradientStroke3.addColorStop(0.2, 'rgba(255, 0, 0, 0.0)'); 
-        gradientStroke3.addColorStop(0, 'rgba(255, 0, 0, 0)');
-
-        new Chart(ctx2, {
+        gradientStroke1.addColorStop(0, 'rgba(75, 192, 192, 0)');
+    
+        chartInstance = new Chart(ctx2, {
             type: "line",
             data: {
-                labels: data.labels,
+                labels: data.labels, // Ensure data contains date labels
                 datasets: [{
                     label: "IES",
                     tension: 0.4,
@@ -186,10 +254,10 @@
                 scales: {
                     y: {
                         grid: {
-                            drawBorder: false,
+                            drawBorder: true,
                             display: true,
                             drawOnChartArea: true,
-                            drawTicks: false,
+                            drawTicks: true,
                             borderDash: [5, 5]
                         },
                         ticks: {
@@ -206,10 +274,10 @@
                     },
                     x: {
                         grid: {
-                            drawBorder: false,
-                            display: false,
+                            drawBorder: true,
+                            display: true,
                             drawOnChartArea: false,
-                            drawTicks: false,
+                            drawTicks: true,
                             borderDash: [5, 5]
                         },
                         ticks: {
@@ -228,13 +296,11 @@
             },
         });
     }
-
-    // Call the createChart function to create the chart
-    createChart();
-</script>
-  <!-- Github buttons -->
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    
+    // Initialize chart with default data (if needed)
+    fetchDataAndUpdateChart();
+  </script>
+    
 </body>
 
 </html>
