@@ -1,0 +1,53 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="row align-items-center my-4">
+                <div class="col">
+                    <h2 class="h3 mb-0 page-title">Инвертроры</h2>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary"><span
+                            class="fe fe-filter fe-12 mr-2"></span>Фильтр</button>
+                </div>
+            </div>
+            <div class="row">
+                {% for inverter in inverters_data %}
+                <div class="col-md-3">
+                    <div class="card shadow mb-4 clickable-card" data-toggle="modal" data-target=".modal-shortcut">
+                        <div class="card-body text-center">
+                            <div class="avatar avatar-lg mt-4">
+                                <img src="{% static 'assets/inverters/growatt.png' %}" alt="..." class="avatar-img rounded-circle">
+                            </div>
+                            <div class="card-text my-2">
+                                <p><strong class="card-title my-0"><span class="h3" style="text-transform: uppercase;">{{ inverter.name }}</span></strong></p>
+                                <p><strong class="card-title my-0"><span class="badge badge-primary">{{ inverter.serial_number }}</span></strong></p>
+                                <p class="small text mb-0"><strong>Всего выработано - {{ inverter.inverter_registers_data.total_generate_energy.data }} кВт·ч</strong></p>
+                                <p class="small text mb-0"><strong>Время работы (всего)- {{ inverter.inverter_registers_data.work_time_total.data }} сек</strong></p>
+                
+                                <!-- <p class="small text mb-0">Текущая мощность- {{ inverter.inverter_registers_data.today_generate_energy.data }} кВт·ч</p>
+                                <p class="small text mb-0">Текущая мощность- {{ inverter.inverter_registers_data.current_power.data }} Вт</p>
+                                <p class="small text mb-0">Температура инвертора - {{ inverter.inverter_registers_data.temperature.data }} ℃</p> -->
+                            </div>
+                        </div> <!-- ./card-text -->
+                        <div class="card-footer">
+                            <div class="row align-items-center justify-content-between">
+                                <div class="col-auto">
+                                    {% if inverter.inverter_registers_data.status.data == '1' %}
+                                    <small><span class="dot dot-lg bg-success mr-1"></span> Online </small>
+                                    {% elif inverter.inverter_registers_data.status.data == '0' %}
+                                    <small><span class="dot dot-lg bg-secondary mr-1"></span> Waiting </small>
+                                    {% elif inverter.inverter_registers_data.status.data == '3' %}
+                                    <small><span class="dot dot-lg bg-danger mr-1"></span> Fault </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div> <!-- /.card-footer -->
+                    </div>
+                </div> <!-- .col -->
+                
+                {% endfor %}
+            </div> <!-- .row -->
+        </div> <!-- .col-12 -->
+    </div> <!-- .row -->
+</div>

@@ -1,0 +1,59 @@
+.calendar-container {
+    text-align: center;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-controls button,
+.calendar-controls input {
+    margin: 0 5px;
+}
+
+#current-date {
+    margin-bottom: 10px;
+}
+
+.view-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.view-buttons button {
+    margin: 0 5px;
+}
+
+.view-buttons button.active {
+    background-color: blue;
+    color: white;
+}
+
+.calendar-container {
+    text-align: center;
+}
+
+#current-date {
+    margin-bottom: 10px;
+}
+
+.clickable-card {
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.clickable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.clickable-card .card-body {
+    transition: background-color 0.3s;
+}
+
+.clickable-card:hover .card-body {
+    background-color: #f8f9fa;
+}
