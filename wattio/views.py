@@ -96,7 +96,9 @@ def fetch_data(request):
     # Get the parameters from the request
     start_date = request.GET.get('start_date')
     interval = request.GET.get('interval')  # day, month, year
-    inverter_serial = 'LJJ8CGA017'
+    inverter_serials =  request.GET.get('description')
+    print('Inverter', inverter_serials)
+
     # Define the API URL
     api_url = f'http://10.40.9.25:8080/data/chart/day/{inverter_serial}/{start_date}'
     

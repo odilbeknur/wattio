@@ -147,10 +147,9 @@ columnChartCtn && (columnChart = new ApexCharts(columnChartCtn, columnChartoptio
 
 document.addEventListener('DOMContentLoaded', function () {
     const datepicker = document.getElementById('datepicker');
-    const todayDateBtn = document.getElementById('today-btn');
     const prevDateBtn = document.getElementById('prev-date');
     const nextDateBtn = document.getElementById('next-date');
-    const apiBaseURL = '/api/fetch-data/';
+    const apiBaseURL = 'http://10.40.9.25:8080/data/chart/day/all/';
 
     // Initialize Flatpickr with today's date as default
     const fp = flatpickr(datepicker, {
@@ -169,11 +168,6 @@ document.addEventListener('DOMContentLoaded', function () {
         navigateDate(1);
     });
 
-    function setActiveButton(button) {
-        document.querySelectorAll('.date-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-    }
-
     function navigateDate(direction) {
         const currentDate = fp.selectedDates[0] || new Date();
         let newDate = new Date(currentDate.setDate(currentDate.getDate() + direction));
@@ -181,27 +175,26 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchDataAndUpdateChart();
     }
 
+    const chartColors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#3F51B5", "#03A9F4", "#4CAF50", "#F9CE1D", "#FF9800"];
+
     var lineChart, lineChartoptions = {
-        series: [{
-            name: "Sozlash",
-            data: [] // Empty array initially
-        }],
+        series: [], // Initialize with empty array
         chart: {
             height: 400,
             type: "line",
-            background: !1,
+            background: false,
             zoom: {
-                enabled: 1
+                enabled: true
             },
             toolbar: {
-                show: 1
+                show: true
             }
         },
         theme: {
             mode: colors.chartTheme
         },
         stroke: {
-            show: !0,
+            show: true,
             curve: "smooth",
             lineCap: "round",
             colors: chartColors,
@@ -209,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dashArray: [0, 0, 0]
         },
         dataLabels: {
-            enabled: !1
+            enabled: false
         },
         responsive: [{
             breakpoint: 480,
@@ -223,10 +216,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }],
         markers: {
             size: 4,
-            colors: base.primaryColor,
+            colors: chartColors,
             strokeColors: colors.borderColor,
             strokeWidth: 2,
-            strokeOpacity: .9,
+            strokeOpacity: 0.9,
             strokeDashArray: 0,
             fillOpacity: 1,
             discrete: [],
@@ -234,11 +227,9 @@ document.addEventListener('DOMContentLoaded', function () {
             radius: 2,
             offsetX: 0,
             offsetY: 0,
-            onClick: void 0,
-            onDblClick: void 0,
-            showNullDataPoints: !0,
+            showNullDataPoints: true,
             hover: {
-                size: void 0,
+                size: undefined,
                 sizeOffset: 3
             }
         },
@@ -246,9 +237,8 @@ document.addEventListener('DOMContentLoaded', function () {
             type: "datetime",
             categories: [],
             labels: {
-                show: !0,
-                trim: !1,
-                minHeight: void 0,
+                show: true,
+                trim: false,
                 maxHeight: 120,
                 style: {
                     colors: colors.mutedColor,
@@ -257,15 +247,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             axisBorder: {
-                show: !1
+                show: false
             }
         },
         yaxis: {
             labels: {
-                show: !0,
-                trim: !1,
+                show: true,
+                trim: false,
                 offsetX: -10,
-                minHeight: void 0,
                 maxHeight: 120,
                 style: {
                     colors: colors.mutedColor,
@@ -280,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fontWeight: 400,
             labels: {
                 colors: colors.mutedColor,
-                useSeriesColors: !1
+                useSeriesColors: false
             },
             markers: {  
                 width: 10,
@@ -289,8 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 strokeColor: colors.borderColor,
                 fillColors: chartColors,
                 radius: 6,
-                customHTML: void 0,
-                onClick: void 0,
                 offsetX: 0,
                 offsetY: 0
             },
@@ -299,34 +286,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 vertical: 0
             },
             onItemClick: {
-                toggleDataSeries: !0
+                toggleDataSeries: true
             },
             onItemHover: {
-                highlightDataSeries: !0
+                highlightDataSeries: true
             }
         },
         grid: {
-            show: !0,
+            show: true,
             borderColor: colors.borderColor,
             strokeDashArray: 0,
             position: "back",
             xaxis: {
                 lines: {
-                    show: !1
+                    show: false
                 }
             },
             yaxis: {
                 lines: {
-                    show: !0
+                    show: true
                 }
             },
             row: {
-                colors: void 0,
-                opacity: .5
+                colors: undefined,
+                opacity: 0.5
             },
             column: {
-                colors: void 0,
-                opacity: .5
+                colors: undefined,
+                opacity: 0.5
             },
             padding: {
                 top: 0,
@@ -341,26 +328,31 @@ document.addEventListener('DOMContentLoaded', function () {
         const dateValue = fp.selectedDates[0].toISOString().split('T')[0];
         
         if (dateValue) {
-            const apiURL = `${apiBaseURL}?start_date=${dateValue}`;
+            const apiURL = `${apiBaseURL}${dateValue}`;
             const response = await fetch(apiURL);
             const dataList = await response.json();
-            console.log(dataList)
-            // Check if dataList contains labels and data
-            if (dataList.labels && dataList.data) {
+
+            if (dataList.length > 0) {
+                const seriesData = dataList.map((item, index) => ({
+                    name: item.serial_number,
+                    data: item.data_list.map(dataItem => ({
+                        x: new Date(dataItem.create_date),
+                        y: dataItem.data
+                    })),
+                    color: chartColors[index % chartColors.length]
+                }));
                 const lineChartCtn = document.querySelector("#lineChart");
                 if (lineChartCtn) {
                     // Update chart options
                     const updatedOptions = {
                         ...lineChartoptions,
-                        series: [{
-                            name: "Sozlash",
-                            data: dataList.data
-                        }],
-                        xaxis: {
-                            categories: dataList.labels
+                        series: seriesData,
+                        markers: {
+                            ...lineChartoptions.markers,
+                            colors: seriesData.map(series => series.color)
                         }
                     };
-
+                    
                     // Destroy the previous chart instance if it exists
                     if (lineChart) {
                         lineChart.destroy();
@@ -371,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     lineChart.render();
                 }
             } else {
-                console.error('Invalid data format:', dataList);
+                console.error('No data available for the selected date.');
             }
         }
     }
