@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const datepicker = document.getElementById('datepicker');
     const prevDateBtn = document.getElementById('prev-date');
     const nextDateBtn = document.getElementById('next-date');
-    const apiBaseURL = 'http://10.40.9.25:8080/data/chart/day/all/';
+    const apiBaseURL = 'http://10.40.9.46:8080/data/chart/day/all/';
 
     // Initialize Flatpickr with today's date as default
     const fp = flatpickr(datepicker, {
@@ -190,9 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 show: true
             }
         },
-        theme: {
-            mode: colors.chartTheme
-        },
         stroke: {
             show: true,
             curve: "smooth",
@@ -204,20 +201,10 @@ document.addEventListener('DOMContentLoaded', function () {
         dataLabels: {
             enabled: false
         },
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                legend: {
-                    position: "bottom",
-                    offsetX: -10,
-                    offsetY: 0
-                }
-            }
-        }],
         markers: {
             size: 4,
             colors: chartColors,
-            strokeColors: colors.borderColor,
+            strokeColors: '#fff',
             strokeWidth: 2,
             strokeOpacity: 0.9,
             strokeDashArray: 0,
@@ -235,15 +222,18 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         xaxis: {
             type: "datetime",
-            categories: [],
             labels: {
                 show: true,
-                trim: false,
-                maxHeight: 120,
+                formatter: function(value, timestamp) {
+                    const date = new Date(timestamp);
+                    const hours = date.getHours();
+                    const minutes = date.getMinutes();
+                    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+                },
                 style: {
-                    colors: colors.mutedColor,
+                    colors: '#333',
                     cssClass: "text-muted",
-                    fontFamily: base.defaultFontFamily
+                    fontFamily: 'Arial'
                 }
             },
             axisBorder: {
@@ -257,25 +247,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 offsetX: -10,
                 maxHeight: 120,
                 style: {
-                    colors: colors.mutedColor,
+                    colors: '#333',
                     cssClass: "text-muted",
-                    fontFamily: base.defaultFontFamily
+                    fontFamily: 'Arial'
                 }
             }
         },
         legend: {
             position: "top",
-            fontFamily: base.defaultFontFamily,
+            fontFamily: 'Arial',
             fontWeight: 400,
             labels: {
-                colors: colors.mutedColor,
+                colors: '#333',
                 useSeriesColors: false
             },
             markers: {  
                 width: 10,
                 height: 10,
                 strokeWidth: 0,
-                strokeColor: colors.borderColor,
+                strokeColor: '#fff',
                 fillColors: chartColors,
                 radius: 6,
                 offsetX: 0,
@@ -294,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         grid: {
             show: true,
-            borderColor: colors.borderColor,
+            borderColor: '#e7e7e7',
             strokeDashArray: 0,
             position: "back",
             xaxis: {
@@ -326,17 +316,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchDataAndUpdateChart() {
         const dateValue = fp.selectedDates[0].toISOString().split('T')[0];
-        
+        console.log(dateValue)
         if (dateValue) {
             const apiURL = `${apiBaseURL}${dateValue}`;
             const response = await fetch(apiURL);
             const dataList = await response.json();
-
+            console.log(dataList)
             if (dataList.length > 0) {
                 const seriesData = dataList.map((item, index) => ({
                     name: item.serial_number,
                     data: item.data_list.map(dataItem => ({
-                        x: new Date(dataItem.create_date),
+                        x: new Date(dataItem.create_date).getTime(),
                         y: dataItem.data
                     })),
                     color: chartColors[index % chartColors.length]

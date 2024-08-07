@@ -16,7 +16,7 @@ def login(request):
         password = request.POST.get('password')
 
         # Your FastAPI endpoint
-        ip = '10.40.9.25:8080'
+        ip = '10.40.9.46:8080'
         url_auth = f"http://{ip}/user/signin"
         data = {"username": username, "password": password}
         response = requests.post(url_auth, data=data)
@@ -33,7 +33,7 @@ def login(request):
 
 def refresh_token(request):
     refresh_token = request.session.get('refresh_token')
-    response = requests.post('http://10.40.9.25:8080/token/refresh/', data={'refresh_token': refresh_token})
+    response = requests.post('http://10.40.9.46:8080/token/refresh/', data={'refresh_token': refresh_token})
     if response.status_code == 200:
         new_token = response.json().get('access_token')
         request.session['access_token'] = new_token
@@ -51,13 +51,13 @@ def index(request):
     headers = {'Authorization': f'Bearer {token}'}
     
     # Get all inverters
-    response = requests.get('http://10.40.9.25:8080/inverter/', headers=headers)
+    response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
     
     if response.status_code == 401:  # Unauthorized
         new_token = refresh_token(request)
         if new_token:
             headers = {'Authorization': f'Bearer {new_token}'}
-            response = requests.get('http://10.40.9.25:8080/inverter/', headers=headers)
+            response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
         else:
             return redirect('logout')  # Redirect to logout if token refresh fails
     
@@ -70,7 +70,7 @@ def index(request):
     inverters_data = []
     for inverter in inverters:
         serial_number = inverter.get('serial_number')
-        last_data_response = requests.get(f'http://10.40.9.25:8080/data/last/{serial_number}', headers=headers)
+        last_data_response = requests.get(f'http://10.40.9.46:8080/data/last/{serial_number}', headers=headers)
         if last_data_response.status_code == 200:
             last_data = last_data_response.json()
             last_data['name'] = inverter.get('name') 
@@ -100,7 +100,7 @@ def fetch_data(request):
     print('Inverter', inverter_serials)
 
     # Define the API URL
-    api_url = f'http://10.40.9.25:8080/data/chart/day/{inverter_serial}/{start_date}'
+    api_url = f'http://10.40.9.46:8080/data/chart/day/{inverter_serial}/{start_date}'
     
     # Fetch data from the external API
     response = requests.get(api_url)
