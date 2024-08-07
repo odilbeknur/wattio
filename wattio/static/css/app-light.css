@@ -4805,8 +4805,8 @@ button.bg-dark:focus {
 .rounded-lg {
   border-radius: 0.3rem !important; }
 
-.rounded-circle {
-  border-radius: 50% !important; }
+/* .rounded-circle {
+  border-radius: 50% !important; } */
 
 .rounded-pill {
   border-radius: 50rem !important; }

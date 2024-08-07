@@ -41,7 +41,7 @@
 }
 
 .clickable-card {
-    cursor: pointer;
+    cursor: default;  
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -57,3 +57,5 @@
 .clickable-card:hover .card-body {
     background-color: #f8f9fa;
 }
+
+

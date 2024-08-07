@@ -159,12 +159,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     prevDateBtn.addEventListener('click', function (event) {
-        event.preventDefault();
         navigateDate(-1);
     });
 
     nextDateBtn.addEventListener('click', function (event) {
-        event.preventDefault();
         navigateDate(1);
     });
 
@@ -184,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
             type: "line",
             background: false,
             zoom: {
-                enabled: true
+                enabled: false
             },
             toolbar: {
                 show: true
@@ -313,9 +311,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     };
-
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+    }
     async function fetchDataAndUpdateChart() {
-        const dateValue = fp.selectedDates[0].toISOString().split('T')[0];
+        const dateValue = formatDate(fp.selectedDates[0]);
         console.log(dateValue)
         if (dateValue) {
             const apiURL = `${apiBaseURL}${dateValue}`;

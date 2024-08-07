@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from datetime import datetime
 import requests
 from .decorators import login_required
+from .forms import InverterForm, PlantForm
+from .models import *
 
 def login(request):
     if 'access_token' in request.session:
@@ -47,26 +49,30 @@ def logout_view(request):
 
 @login_required
 def index(request):
+    # Получаем токен доступа из сессии
     token = request.session.get('access_token')
     headers = {'Authorization': f'Bearer {token}'}
     
-    # Get all inverters
+    # Получаем все инверторы из внешнего API
     response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
     
-    if response.status_code == 401:  # Unauthorized
+    if response.status_code == 401:  # Не авторизован
         new_token = refresh_token(request)
         if new_token:
             headers = {'Authorization': f'Bearer {new_token}'}
             response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
         else:
-            return redirect('logout')  # Redirect to logout if token refresh fails
+            return redirect('logout')  # Перенаправление на выход, если не удалось обновить токен
     
     if response.status_code != 200:
-        return redirect('logout')  # Redirect to logout if the request fails
+        return redirect('logout')  # Перенаправление на выход, если запрос не удался
     
     inverters = response.json()
     
-    # Get last data for each inverter
+    # Создаем список серийных номеров для select поля
+    serial_choices = [(inverter['serial_number'], inverter['serial_number']) for inverter in inverters]
+    
+    # Получаем последние данные для каждого инвертора
     inverters_data = []
     for inverter in inverters:
         serial_number = inverter.get('serial_number')
@@ -77,10 +83,23 @@ def index(request):
             last_data['registers'] = inverter.get('registers') 
             inverters_data.append(last_data)
     
+    # Обработка отправки формы
+    if request.method == 'POST':
+        form = InverterForm(request.POST, request.FILES, serial_choices=serial_choices)
+        if form.is_valid():
+            form.save()
+            return redirect('index')  # Перенаправление на ту же страницу после успешной отправки формы
+    else:
+        form = InverterForm(serial_choices=serial_choices)
+    
     context = {
-        'description': inverters,
-        'inverters_data': inverters_data
+        'widgets_serial': Inverter.objects.all(),  # Просмотр инверторов
+        'plants': Plant.objects.all(),  # Навигация по растениям
+        'inverters_data': inverters_data,
+        'form': form
     }
+
+    print(serial_choices)  # Для отладки
     return render(request, 'index.html', context)
 
 @login_required
@@ -91,32 +110,20 @@ def calendar(request):
 def test(request):
     return render(request, 'components/test.html')
 
-@login_required
-def fetch_data(request):
-    # Get the parameters from the request
-    start_date = request.GET.get('start_date')
-    interval = request.GET.get('interval')  # day, month, year
-    inverter_serials =  request.GET.get('description')
-    print('Inverter', inverter_serials)
 
-    # Define the API URL
-    api_url = f'http://10.40.9.46:8080/data/chart/day/{inverter_serial}/{start_date}'
-    
-    # Fetch data from the external API
-    response = requests.get(api_url)
-    data = response.json()
-    # Format data
-    formatted_data = {
-        'labels': [format_date(item['create_date']) for item in data['data_list']],
-        'data': [item['data'] for item in data['data_list']]
-    }
-    # Return formatted data as JSON
-    return JsonResponse(formatted_data)
 
-def format_date(date_str):
-    """Convert ISO 8601 date string to HH:mm format."""
-    try:
-        date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-        return date_obj.strftime('%H:%M')
-    except ValueError:
-        return date_str
+def inverter_create(request):
+    if request.method == 'POST':
+        form = InverterForm(request.POST, request.FILES)
+        if form.is_valid():
+            exam = form.save()
+            exam.save()
+            return redirect('index')
+        print(form)
+    else:
+        form = InverterForm()
+        context = {
+            'form': form,
+            'title': 'Добавить инвертор'
+        }
+        return render(request, 'index.html', context)

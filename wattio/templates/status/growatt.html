@@ -1,0 +1,13 @@
+<div class="card-footer">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-auto">
+            {% if inverter.inverter_registers_data.status.data == '1' %}
+            <small><span class="dot dot-lg bg-success mr-1"></span> Online </small>
+            {% elif inverter.inverter_registers_data.status.data == '0' %}
+            <small><span class="dot dot-lg bg-secondary mr-1"></span> Waiting </small>
+            {% elif inverter.inverter_registers_data.status.data == '3' %}
+            <small><span class="dot dot-lg bg-danger mr-1"></span> Fault </small>
+            {% endif %}
+        </div>
+    </div>
+</div> <!-- /.card-footer -->
