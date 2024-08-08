@@ -37,11 +37,7 @@
                         </div>
                         <div class="tab-content mb-1" id="pills-tabContent">
                             <div class="tab-pane fade active show" id="day" role="tabpanel" aria-labelledby="day-tab">
-                                <div class="card-body">
-                                    <div id="lineChart" class="chart-container">
-                                        <div id="no-data-message" class="no-data-message">No data available</div>
-                                    </div>
-                                </div> <!-- /.card-body -->
+                                {% include 'widgets/linechart.html'%} 
                             </div>
                             <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
                                 {% include 'widgets/columnchartmonth.html'%} 

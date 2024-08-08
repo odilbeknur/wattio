@@ -2,15 +2,23 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-12">
-            <div class="row align-items-center my-4">
-                <div class="col">
-                    <h2 class="h3 mb-0 page-title">Инвертроры</h2>
+            <div class="row align-items-center mb-2">
+                <div class="col-5">
+                    <h2 class="h5 page-title">Инверторы</h2>
                 </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><span
-                            class="fe fe-plus fe-12 mr-2"></span>Добавить</button>
+                <div class="col-7 d-flex align-items-center justify-content-end align-middle">
+                    <div class="form-group d-none d-lg-inline mb-0">
+                        <label for="reportrange" class="sr-only">Date Ranges</label>
+                        <div class="px-2 py-2 text-muted">
+                            <span class="small" id="date-range-text"></span>
+                        </div>
+                    </div>
+                    <a href="/" id="refresh"><button type="button" class="btn btn-sm" ><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button></a>
+                    <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><span class="fe fe-filter fe-16 text-muted"></span></button>
                 </div>
             </div>
+            
+            
             <div class="row">
                 {% for widget in widgets_serial %}
                 {% for inverter in inverters_data %} 
@@ -35,11 +43,11 @@
                             </div>
                             {% endif %}
                             <div class="card-text my-2">
-                                <p><strong class="card-title my-0"><span class="h3" style="text-transform: uppercase;">{{ inverter.name }}</span></strong></p>
-                                <p><strong class="card-title my-0"><span class="badge badge-primary">{{ inverter.serial_number }}</span></strong></p>
-                                <p class="small text mb-0"><strong>Всего выработано - {{ inverter.inverter_registers_data.total_generate_energy.data }} кВт*ч</strong></p>
-                                <p class="small text mb-0"><strong>Время работы (всего) - {{ inverter.inverter_registers_data.work_time_total.data }} ч</strong></p>
-                                <p class="small text mb-0"><strong>Текущая выработка - {{ inverter.inverter_registers_data.total_generate_energy.data }} Вт</strong></p>
+                                <p class="medium"><strong class="card-title my-0"><span class="h3" style="text-transform: uppercase;">{{ inverter.name }}</span></strong></p>
+                                <p class="medium"><strong class="card-title my-0"><span class="badge badge-info">{{ inverter.serial_number }}</span></strong></p>
+                                <p class="medium text mb-0"><strong>Всего выработано - {{ inverter.inverter_registers_data.total_generate_energy.data }} кВт*ч</strong></p>
+                                <p class="medium text mb-0"><strong>Время работы (всего) - {{ inverter.inverter_registers_data.work_time_total.data }} ч</strong></p>
+                                <p class="medium text mb-0"><strong>Активная мощность - {{ inverter.inverter_registers_data.total_generate_energy.data }} Вт</strong></p>
                             </div>
                         </div> <!-- ./card-text -->
                         {% if widget.name == 'growatt' %}

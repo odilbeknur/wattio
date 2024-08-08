@@ -47,6 +47,34 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+
+@login_required
+def calendar(request):
+    return render(request, 'components/calendar.html')
+
+@login_required
+def test(request):
+    return render(request, 'components/test.html')
+
+
+@login_required
+def inverter_create(request):
+    if request.method == 'POST':
+        form = InverterForm(request.POST, request.FILES)
+        if form.is_valid():
+            exam = form.save()
+            exam.save()
+            return redirect('index')
+        print(form)
+    else:
+        form = InverterForm()
+        context = {
+            'form': form,
+            'title': 'Добавить инвертор'
+        }
+        return render(request, 'index.html', context)
+
+ 
 @login_required
 def index(request):
     # Получаем токен доступа из сессии
@@ -101,29 +129,44 @@ def index(request):
 
     print(serial_choices)  # Для отладки
     return render(request, 'index.html', context)
-
+   
 @login_required
-def calendar(request):
-    return render(request, 'components/calendar.html')
-
-@login_required
-def test(request):
-    return render(request, 'components/test.html')
-
-
-
-def inverter_create(request):
-    if request.method == 'POST':
-        form = InverterForm(request.POST, request.FILES)
-        if form.is_valid():
-            exam = form.save()
-            exam.save()
-            return redirect('index')
-        print(form)
-    else:
-        form = InverterForm()
-        context = {
-            'form': form,
-            'title': 'Добавить инвертор'
-        }
-        return render(request, 'index.html', context)
+def plant_view(request):
+     # Получаем токен доступа из сессии
+    token = request.session.get('access_token')
+    headers = {'Authorization': f'Bearer {token}'}
+    
+    # Получаем все инверторы из внешнего API
+    response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
+    
+    if response.status_code == 401:  # Не авторизован
+        new_token = refresh_token(request)
+        if new_token:
+            headers = {'Authorization': f'Bearer {new_token}'}
+            response = requests.get('http://10.40.9.46:8080/inverter/', headers=headers)
+        else:
+            return redirect('logout')  # Перенаправление на выход, если не удалось обновить токен
+    
+    if response.status_code != 200:
+        return redirect('logout')  # Перенаправление на выход, если запрос не удался
+    
+    inverters = response.json()
+    
+    # Создаем список серийных номеров для select поля
+    serial_choices = [(inverter['serial_number'], inverter['serial_number']) for inverter in inverters]
+    
+    # Получаем последние данные для каждого инвертора
+    inverters_data = []
+    for inverter in inverters:
+        serial_number = inverter.get('serial_number')
+        last_data_response = requests.get(f'http://10.40.9.46:8080/data/last/{serial_number}', headers=headers)
+        if last_data_response.status_code == 200:
+            last_data = last_data_response.json()
+            last_data['name'] = inverter.get('name') 
+            last_data['registers'] = inverter.get('registers') 
+            inverters_data.append(last_data)
+    context = {
+        'inverters_data': inverters_data,
+        'plants': Plant.objects.all(),  # Навигация по растениям
+    }
+    return render(request, 'plants.html', context)

@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const seriesData = dataList.map((item, index) => ({
                     name: item.serial_number,
                     data: item.data_list.map(dataItem => ({
-                        x: new Date(dataItem.create_date).getTime(),
+                        x: new Date(dataItem.create_date).getTime() + 5,
                         y: dataItem.data
                     })),
                     color: chartColors[index % chartColors.length]

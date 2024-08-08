@@ -3,12 +3,13 @@
 <html lang="en">
 
 <head>
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="favicon.ico">
-    <title>WattIO</title>
+    <title>TPP Solar</title>
     <!-- Simple bar CSS -->
     <link rel="stylesheet" href="{% static 'css/simplebar.css' %}">
     <!-- Fonts CSS -->
@@ -23,11 +24,8 @@
     <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
     <link rel="stylesheet" href="{% static 'css/fullcalendar.css' %}">
     <link rel="stylesheet" href="{% static 'css/calendar.css' %}" id="lightTheme">
-
-
-    <link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.3/apexcharts.min.js"></script>
+    {% block heads%}
+    {% endblock%}
 </head>
 
 <body class="vertical  light">
@@ -58,18 +56,12 @@
     <script src="{% static 'js/apps.js' %}"></script>
 
 
-    <script>
-        /* defind global options */
-        Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
-        Chart.defaults.global.defaultFontColor = colors.mutedColor;
-    </script>
+    {% block scripts %}
+
+    {% endblock %}
     <script src="{% static 'js/gauge.min.js' %}"></script>
     <script src="{% static 'js/jquery.sparkline.min.js' %}"></script>
-    <script src="{% static 'js/apexcharts.min.js' %}"></script>
-    <script src="{% static 'js/apexcharts.custom.js' %}"></script>
-
-
-    <script src="{% static 'js/calendar.js' %}"></script>
+    
     <script src="{% static 'js/modal.js' %}"></script>
 
 </body>

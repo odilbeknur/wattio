@@ -1,3 +1,12 @@
+function updateDateTime() {
+    const dateRangeText = document.getElementById('date-range-text');
+    const currentDate = new Date();
+    console.log(currentDate)
+    const dateString = currentDate.toLocaleDateString('ru-RU', { month: 'long', day: 'numeric', year: 'numeric' });
+    const timeString = currentDate.toLocaleTimeString('ru-RU', { hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    dateRangeText.textContent = `${dateString}, ${timeString}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const datePicker = document.getElementById('datepicker');
     const prevDayButton = document.getElementById('prev-date');
@@ -34,5 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
+    updateDateTime();
     updateDateDisplay();
 });
+
+
+
