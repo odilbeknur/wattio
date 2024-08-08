@@ -292,7 +292,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const datepicker = document.getElementById('datepicker');
     const prevDateBtn = document.getElementById('prev-date');
     const nextDateBtn = document.getElementById('next-date');
-    const apiBaseURL = 'http://10.40.9.46:8080/data/chart/day/all/';
+    const serialNumberElement = document.getElementById('serial_number');
+    const apiBaseURL = 'http://10.40.9.46:8080/data/chart/day/';
 
     // Initialize Flatpickr with today's date as default
     const fp = flatpickr(datepicker, {
@@ -301,17 +302,17 @@ document.addEventListener('DOMContentLoaded', function () {
         onChange: fetchDataAndUpdateChart
     });
 
-    prevDateBtn.addEventListener('click', function (event) {
+    prevDateBtn.addEventListener('click', function () {
         navigateDate(-1);
     });
 
-    nextDateBtn.addEventListener('click', function (event) {
+    nextDateBtn.addEventListener('click', function () {
         navigateDate(1);
     });
 
     function navigateDate(direction) {
         const currentDate = fp.selectedDates[0] || new Date();
-        let newDate = new Date(currentDate.setDate(currentDate.getDate() + direction));
+        const newDate = new Date(currentDate.setDate(currentDate.getDate() + direction));
         fp.setDate(newDate);
         fetchDataAndUpdateChart();
     }
@@ -454,63 +455,76 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     };
+
     function formatDate(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        
         return `${year}-${month}-${day}`;
     }
+
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(fp.selectedDates[0]);
-        if (dateValue) {
-            const apiURL = `${apiBaseURL}${dateValue}`;
-            const response = await fetch(apiURL);
-            const dataList = await response.json();
-            console.log(dataList)
-            if (dataList.length > 0) {
-                const seriesData = dataList.map((item, index) => ({
-                    name: item.serial_number,
-                    data: item.data_list.map(dataItem => {
-                        let date = new Date(dataItem.create_date);
-                        date.setHours(date.getHours() + 5); // Добавление 5 часов к времени
-                        return {
-                            x: date.getTime(),
+        const serialNumber = serialNumberElement ? serialNumberElement.textContent : '';
+        if (dateValue && serialNumber) {
+            const apiURL = `${apiBaseURL}${serialNumber}/${dateValue}`;
+            console.log(apiURL)
+                const response = await fetch(apiURL);
+                const dataList = await response.json();
+                const dataresponse = dataList.data_list;
+                console.log(dataresponse)
+                if (dataresponse.length > 0) {
+                    const seriesData = [{
+                        name: serialNumber,
+                        data: dataresponse.map(dataItem => ({
+                            x: new Date(dataItem.create_date).getTime() + 5,
                             y: dataItem.data
+                        })),
+                        color: chartColors[0] // Assuming one color for one series
+                    }];
+                    const lineChartCtn = document.querySelector("#lineChart");
+                    if (lineChartCtn) {
+                        // Update chart options
+                        const updatedOptions = {
+                            ...lineChartoptions,
+                            series: seriesData,
+                            markers: {
+                                ...lineChartoptions.markers,
+                                colors: [chartColors[0]]
+                            }
                         };
-                    }),
-                    color: chartColors[index % chartColors.length]
-                }));
-                const lineChartCtn = document.querySelector("#lineChart");
-                if (lineChartCtn) {
-                    // Update chart options
-                    const updatedOptions = {
-                        ...lineChartoptions,
-                        series: seriesData,
-                        markers: {
-                            ...lineChartoptions.markers,
-                            colors: seriesData.map(series => series.color)
+                        
+                        // Destroy the previous chart instance if it exists
+                        if (lineChart) {
+                            lineChart.destroy();
                         }
-                    };
-                    
+                
+                        // Create and render a new chart
+                        lineChart = new ApexCharts(lineChartCtn, updatedOptions);
+                        lineChart.render();
+                    }
+                } else {
+                    console.error('Нет данных для выбранной даты.');
                     // Destroy the previous chart instance if it exists
                     if (lineChart) {
                         lineChart.destroy();
+                        lineChart = null; // Clear the reference to the chart instance
                     }
-
-                    // Create and render a new chart
-                    lineChart = new ApexCharts(lineChartCtn, updatedOptions);
-                    lineChart.render();
+                
+                    // Clear the chart container
+                    const lineChartCtn = document.querySelector("#lineChart");
+                    if (lineChartCtn) {
+                        lineChartCtn.innerHTML = '<p>Нет данных для выбранной даты.</p>';
+                    }
                 }
-            } else {
-                console.error('No data available for the selected date.');
-            }
+                
         }
     }
 
     // Initial chart rendering
     fetchDataAndUpdateChart();
 });
+
 
 
 
