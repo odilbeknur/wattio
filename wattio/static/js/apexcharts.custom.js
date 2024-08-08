@@ -8,7 +8,7 @@ var columnChart, columnChartoptions = {
         }],
         chart: {
             type: "bar",
-            height: 350,
+            height: 400,
             stacked: !1,
             columnWidth: "70%",
             zoom: {
@@ -156,7 +156,7 @@ var columnChart, columnChartoptions = {
     }],
     chart: {
         type: "bar",
-        height: 350,
+        height: 400,
         stacked: !1,
         columnWidth: "70%",
         zoom: {
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
         xaxis: {
             type: "datetime",
             labels: {
-                show: true,
+                show: false,
                 formatter: function(value, timestamp) {
                     const date = new Date(timestamp);
                     const hours = date.getHours();

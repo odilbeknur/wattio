@@ -9,5 +9,7 @@ urlpatterns = [
     path('calendar/', calendar, name='calendar'),
     path('test/', test, name='test'),
     path('add-inverter/', inverter_create, name='add_inverter'),
-    path('plant-detail/', plant_view, name='plant-detail'),
+    path('plants/', plant_view, name='plants'),
+    path('inverter/<str:serial_number>/', inverter_view, name='inverter'),
+    
    ]

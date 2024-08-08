@@ -24,14 +24,14 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                <a href="#ui-elements" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                <a href="#plants" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-cpu fe-16"></i>
                     <span class="ml-3 item-text">Станции</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
+                <ul class="collapse list-unstyled pl-4 w-100" id="plants">
                     {% for plant in plants %}
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="{% url 'plant-detail' %}"><span class="ml-1 item-text">{{plant.name}}</span>
+                        <a class="nav-link pl-3" href="{% url 'plants' %}"><span class="ml-1 item-text">{{plant.name}}</span>
                         </a>
                     </li>
                     {% endfor %}

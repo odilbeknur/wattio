@@ -1,0 +1,41 @@
+<div class="card-header">
+    <strong class="card-title mb-0">Тренды</strong><br><br>
+    <div class="row">
+        <div class="col-3 col-lg-3 mb-4">
+            <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="day-tab" data-toggle="pill" href="#day" role="tab"
+                        aria-controls="day" aria-selected="true">День</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="month-tab" data-toggle="pill" href="#month" role="tab" aria-controls="month"
+                        aria-selected="false">Месяц</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="year-tab" data-toggle="pill" href="#year" role="tab" aria-controls="year"
+                        aria-selected="false">Год</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-3 col-lg-6 mb-4">
+            <div class="calendar-controls d-flex justify-content-center align-items-center mb-3">
+                <button type="button" id="prev-date" class="fc-prev-button btn" aria-label="prev"><span
+                        class="fe fe-chevron-left"></span></button>
+                <input type="date" id="datepicker" class="form-control  col-md-2 ">
+                <button type="button" id="next-date" class="fc-next-button btn" aria-label="next"><span
+                        class="fe fe-chevron-right"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tab-content mb-1" id="pills-tabContent">
+    <div class="tab-pane fade active show" id="day" role="tabpanel" aria-labelledby="day-tab">
+        {% include 'widgets/linechart.html'%}
+    </div>
+    <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
+        {% include 'widgets/columnchartmonth.html'%}
+    </div>
+    <div class="tab-pane fade" id="year" role="tabpanel" aria-labelledby="year-tab">
+        {% include 'widgets/columnchartyear.html'%}
+    </div>
+</div>

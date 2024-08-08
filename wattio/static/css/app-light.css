@@ -95,12 +95,16 @@ ul ol {
 
 dt {
   font-weight: bold;
-  font-size: larger;
+  font-size: medium;
 }
 
 dd {
   margin-bottom: .5rem;
-  margin-left: 0; }
+  margin-left: 0; 
+  font-size: small;
+  font-weight: bold;
+
+}
 
 blockquote {
   margin: 0 0 1rem; }

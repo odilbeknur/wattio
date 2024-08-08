@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.find('#modalSerial').text(serial);
         modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');
         modal.find('#modalTodayEnergy').text(todayEnergy + ' Вт·ч');
-        modal.find('#modalTemperature').text(temperature + '℃');
-        modal.find('#modalCurrentPower').text(currentPower + 'Вт');
+        modal.find('#modalTemperature').text(temperature + ' ℃');
+        modal.find('#modalCurrentPower').text(currentPower + ' Вт');
         modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');
-        modal.find('#modalWorkTime').text(workTime + 'ч');
+        modal.find('#modalWorkTime').text(workTime + ' ч');
         
         // Set status text based on status value
         var statusText = '';
@@ -38,5 +38,12 @@ document.addEventListener('DOMContentLoaded', function () {
             statusClass = 'text-danger';
         }
         modal.find('#modalStatus').html('<span class="' + statusClass + '">' + statusText + '</span>');
+       
+       // Construct the URL dynamically
+       var baseUrl = "{% url 'inverter' dummy_serial %}";  // Generates a URL like /inverter/dummy_serial/
+       var detailUrl = baseUrl.replace('dummy_serial', serial);  // Replaces 'dummy_serial' with the actual serial number
+
+       var modalLink = document.getElementById('modalLink');
+            modalLink.href = '/inverter/' + serial;
     });
 });

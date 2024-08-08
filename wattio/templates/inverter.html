@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block heads%}
+<link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
+{% endblock%}
+
+{% block main %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="row align-items-center mb-2">
+        <div class="col">
+          <h2 class="h5 page-title"></h2>
+        </div>
+        <div class="col-auto">
+          <form class="form-inline">
+            <div class="form-group d-none d-lg-inline">
+              <label for="reportrange" class="sr-only">Date Ranges</label>
+              <div id="reportrange" class="px-2 py-2 text-muted">
+                <span class="small"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-sm"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
+              <button type="button" class="btn btn-sm mr-2"><span class="fe fe-filter fe-16 text-muted"></span></button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card shadow my-4">
+        <div class="card-body">
+          <div class="row align-items-center my-4">
+            <div class="col-md-4">
+              <div class="mx-4">
+                <div class="mx-4">
+                  {% if info.name == 'growatt' %}
+                  <img src="{% static 'assets/inverters/growatt.png' %}" alt="..." style="max-width: 200px;"
+                    class="card-img-top img-fluid rounded">
+                  {% elif info.name == 'solax' %}
+                  <img src="{% static 'assets/inverters/solax.png' %}" alt="..." style="max-width: 200px;"
+                    class="card-img-top img-fluid rounded">
+                  {% endif %}
+                </div>
+                <strong class="mb-0 text-uppercase text-muted">Серийный номер</strong><br />
+                <h3>{{ inverter.serial_number }}</h3>
+                <p class="text-muted">Основные показатели работы инвертора</p>
+              </div>
+              <div class="row align-items-center">
+                <div class="col-6">
+                  <div class="p-4">
+                    <p class="small text-uppercase text-muted mb-0">Всего выработано </p>
+                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.total_generate_energy.data }} -
+                      кВт*ч</span>
+                    <p class="small mb-0">
+                      <span class="fe fe-arrow-up text-success fe-12"></span>
+                      <span class="text-muted ml-1">+1.5%</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-4">
+                    <p class="small text-uppercase text-muted mb-0">Время работы (всего)</p>
+                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.work_time_total.data }} - ч</span>
+                    <p class="small mb-0">
+                      <span class="fe fe-arrow-up text-success fe-12"></span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="row align-items-center">
+                <div class="col-6">
+                  <div class="p-4">
+                    <p class="small text-uppercase text-muted mb-0">Активная мощность</p>
+                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.total_generate_energy.data }} - Вт</span>
+                    <p class="small mb-0">
+                      <span class="fe fe-arrow-up text-success fe-12"></span>
+                    </p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-4">
+                    <p class="small text-uppercase text-muted mb-0">Температура</p>
+                    <span class="h2 mb-0">{{ inverter.inverter_registers_data.temperature.data }} - ℃</span>
+                    <p class="small mb-0">
+                      <span class="fe fe-arrow-up text-success fe-12"></span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-8">
+              {% include 'widgets/inv-charts.html'%}
+              <div class="mr-4">
+                <div id="lineChart"></div>
+              </div>
+            </div> <!-- .col-md-8 -->
+          </div> <!-- end section -->
+        </div> <!-- .card-body -->
+      </div> <!-- .card -->
+    </div>
+  </div> <!-- .row -->
+</div> <!-- .container-fluid -->
+{% endblock main %}
+{% block scripts %}
+<script src="{% static 'js/calendar.js' %}"></script>
+<script src="{% static 'js/apexcharts.min.js' %}"></script>
+<script src="{% static 'js/apexcharts.custom.js' %}"></script>
+<script src="{% static 'js/flatpickr.min.js' %}"></script>
+{% endblock %}
