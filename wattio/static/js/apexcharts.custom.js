@@ -469,12 +469,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(fp.selectedDates[0]);
-        console.log(dateValue)
         if (dateValue) {
             const apiURL = `${apiBaseURL}${dateValue}`;
             const response = await fetch(apiURL);
             const dataList = await response.json();
-            console.log(dataList)
             if (dataList.length > 0) {
                 const seriesData = dataList.map((item, index) => ({
                     name: item.serial_number,

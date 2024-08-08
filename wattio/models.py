@@ -18,7 +18,7 @@ class Inverter(models.Model):
     name = models.CharField(max_length=120, verbose_name='Название',choices=inverters, default=None, blank=True)
     serial = models.CharField(max_length=120, verbose_name='Серийный номер', unique=True)
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Станция')
-    color = models.TextField(max_length=120, default='Цвет', verbose_name='Цвет')
+    color = models.CharField(max_length=120, default='#0cab46', verbose_name='Цвет')
 
     def __str__(self):
         return self.name
