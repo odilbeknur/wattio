@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevDateBtn = document.getElementById('prev-date');
     const nextDateBtn = document.getElementById('next-date');
     const serialNumberElement = document.getElementById('serial_number');
-    const apiBaseURL = 'http://10.40.9.46:8080/data/chart/day/';
+    const apiBaseURL = 'http://10.20.6.30:8080/data/chart/day/';
 
     // Initialize Flatpickr with today's date as default
     const fp = flatpickr(datepicker, {

@@ -18,7 +18,7 @@ def login(request):
         password = request.POST.get('password')
 
         # Your FastAPI endpoint
-        ip = '10.40.9.46:8080'
+        ip = '10.20.6.30:8080'
         url_auth = f"http://{ip}/user/signin"
         data = {"username": username, "password": password}
         response = requests.post(url_auth, data=data)
@@ -35,7 +35,7 @@ def login(request):
 
 def refresh_token(request):
     refresh_token = request.session.get('refresh_token')
-    response = requests.post('http://10.40.9.46:8080/token/refresh/', data={'refresh_token': refresh_token})
+    response = requests.post('http://10.20.6.30:8080/token/refresh/', data={'refresh_token': refresh_token})
     if response.status_code == 200:
         new_token = response.json().get('access_token')
         request.session['access_token'] = new_token
@@ -93,7 +93,7 @@ def fetch_data_from_api(url, headers):
 
 def get_inverters_data(token):
     headers = {'Authorization': f'Bearer {token}'}
-    inverters, redirect_view = fetch_data_from_api('http://10.40.9.46:8080/inverter/', headers)
+    inverters, redirect_view = fetch_data_from_api('http://10.20.6.30:8080/inverter/', headers)
     if redirect_view:
         return None, redirect_view
 
@@ -102,7 +102,7 @@ def get_inverters_data(token):
     inverters_data = []
     for inverter in inverters:
         serial_number = inverter.get('serial_number')
-        last_data, _ = fetch_data_from_api(f'http://10.40.9.46:8080/data/last/{serial_number}', headers)
+        last_data, _ = fetch_data_from_api(f'http://10.20.6.30:8080/data/last/{serial_number}', headers)
         if last_data:
             last_data.update({
                 'name': inverter.get('name'),
@@ -158,7 +158,7 @@ def inverter_view(request, serial_number):
     headers = {'Authorization': f'Bearer {token}'}
     
     # Fetch inverters data from API
-    inverters, redirect_view = fetch_data_from_api('http://10.40.9.46:8080/inverter/', headers)
+    inverters, redirect_view = fetch_data_from_api('http://10.20.6.30:8080/inverter/', headers)
     if redirect_view:
         return redirect(redirect_view)
     
@@ -172,7 +172,7 @@ def inverter_view(request, serial_number):
         return render(request, 'error.html', {'message': 'Inverter not found in API data.'})
 
     # Fetch additional data for the specific inverter
-    last_data, _ = fetch_data_from_api(f'http://10.40.9.46:8080/data/last/{serial_number}', headers)
+    last_data, _ = fetch_data_from_api(f'http://10.20.6.30:8080/data/last/{serial_number}', headers)
     if last_data:
         last_data.update({
             'name': inverter_data.get('name'),
