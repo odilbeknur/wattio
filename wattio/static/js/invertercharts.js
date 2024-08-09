@@ -476,10 +476,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (dataresponse.length > 0) {
                     const seriesData = [{
                         name: serialNumber,
-                        data: dataresponse.map(dataItem => ({
-                            x: new Date(dataItem.create_date).getTime() + 5,
-                            y: dataItem.data
-                        })),
+                        data: dataresponse.map(dataItem => {
+                            let dates = new Date(dataItem.create_date);
+                            dates.setHours(dates.getHours() + 5);
+                            return {
+                                x: dates.getTime(),
+                                y: dataItem.data
+                            };
+                        }),
                         color: chartColors[0] // Assuming one color for one series
                     }];
                     const lineChartCtn = document.querySelector("#lineChart");

@@ -48,3 +48,10 @@
     </div> <!-- .row -->
 </div> <!-- .container-fluid -->
 {% endblock main %}   
+{% block scripts %}
+<script>
+  setInterval(function() {
+            window.location.reload();
+        }, 5 * 60 * 1000);
+</script>
+{% endblock %}

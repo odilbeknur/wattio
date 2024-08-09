@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.find('#modalModel').text(model);
         modal.find('#modalSerial').text(serial);
         modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');
-        modal.find('#modalTodayEnergy').text(todayEnergy + ' Вт·ч');
+        modal.find('#modalTodayEnergy').text(todayEnergy + ' кВт·ч');
         modal.find('#modalTemperature').text(temperature + ' ℃');
         modal.find('#modalCurrentPower').text(currentPower + ' Вт');
         modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');

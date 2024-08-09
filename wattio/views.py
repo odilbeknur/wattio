@@ -186,5 +186,6 @@ def inverter_view(request, serial_number):
     context = {
         'inverter': last_data,
         'info': local_inverter,  # Optional, if you need to display or use local data
+        'plants': Plant.objects.all()
     }
     return render(request, 'inverter.html', context)
