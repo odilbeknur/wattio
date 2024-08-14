@@ -42,22 +42,18 @@ def refresh_token(request):
         return new_token
     return None
 
-@login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
 
 
-@login_required
 def calendar(request):
     return render(request, 'components/calendar.html')
 
-@login_required
 def test(request):
     return render(request, 'components/test.html')
 
 
-@login_required
 def inverter_create(request):
     if request.method == 'POST':
         form = InverterForm(request.POST, request.FILES)
@@ -112,10 +108,23 @@ def get_inverters_data(token):
 
     return {'serial_choices': serial_choices, 'inverters_data': inverters_data}, None
 
-@login_required
+def filter_data(data_list, filter_date):
+    # Convert the filter_date to a datetime object for comparison
+    filter_datetime = datetime.strptime(filter_date, '%Y-%m-%d %H:%M')
+    
+    # Filter the data
+    filtered_data = [
+        data for data in data_list 
+        if datetime.strptime(data['create_date'], '%Y-%m-%dT%H:%M:%S.%f') >= filter_datetime
+    ]
+    
+    return filtered_data
+
 def index(request):
     token = get_access_token(request)
     data, redirect_view = get_inverters_data(token)
+    today_date = datetime.today().strftime('%Y-%m-%d')
+
     if redirect_view:
         return redirect(redirect_view)
 
@@ -128,7 +137,9 @@ def index(request):
     else:
         form = InverterForm(serial_choices=data['serial_choices'])
 
+    info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
     context = {
+        'modal_info': info,
         'widgets_serial': Inverter.objects.all(),
         'plants': Plant.objects.all(),
         'inverters_data': data['inverters_data'],
@@ -137,7 +148,6 @@ def index(request):
 
     return render(request, 'index.html', context)
 
-@login_required
 def plant_view(request):
     token = get_access_token(request)
     data, redirect_view = get_inverters_data(token)
@@ -151,7 +161,6 @@ def plant_view(request):
 
     return render(request, 'plants.html', context)
 
-@login_required
 def inverter_view(request, serial_number):
     # Fetch access token and prepare headers
     token = get_access_token(request)
@@ -179,8 +188,7 @@ def inverter_view(request, serial_number):
             'registers': inverter_data.get('registers')
         })
 
-    # You might also want to fetch additional information from the Django model if needed
-    # e.g., check if the serial number exists in the local database
+    # check if the serial number exists in the local database
     local_inverter = Inverter.objects.filter(serial=serial_number).first()
 
     context = {

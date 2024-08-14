@@ -102,7 +102,7 @@ dd {
   margin-bottom: .5rem;
   margin-left: 0; 
   font-size: small;
-  font-weight: bold;
+  font-weight: 900;
 
 }
 
@@ -12005,5 +12005,38 @@ a.uppy-Dashboard-poweredBy {
     top: -10px;
     right: -35px; } }
 
+.scrollable-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .scrollable-table thead {
+    width: calc(100% - 1em); /* Adjust for scrollbar width */
+    display: table;
+    table-layout: fixed;
+  }
+
+  .scrollable-table tbody {
+    display: block;
+    max-height: 300px; /* Adjust height as needed */
+    overflow-y: auto;
+    width: 100%;
+  }
+
+  .scrollable-table thead th, .scrollable-table tbody td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  .scrollable-table tbody tr {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+  }
+  .number-column {
+    width: 50px; /* Adjust the width as needed */
+    text-align: center; /* Center-align the number for better appearance */
+}
 
     

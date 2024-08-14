@@ -34,7 +34,7 @@
                                         <td><a href="{% url 'inverter' serial_number=inverter.serial_number %}">{{ inverter.serial_number }}</a></td>
                                         <td>{{ inverter.inverter_registers_data.temperature.data }} ℃   </td>
                                         <td>{{ inverter.inverter_registers_data.total_generate_energy.data }} кВт*ч</td>
-                                        <td>{{ inverter.inverter_registers_data.today_generate_energy.data }} Вт*ч</td>
+                                        <td>{{ inverter.inverter_registers_data.today_generate_energy.data }} кВт*ч</td>
                                         <td>{{ inverter.inverter_registers_data.work_time_total.data }} ч</td>
                                     </tr>
                                     {% endfor %}

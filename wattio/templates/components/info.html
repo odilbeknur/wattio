@@ -1,6 +1,7 @@
+{% load custom_filters %}
 <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="defaultModalLabel">Информация</h5>
@@ -40,6 +41,32 @@
                 </dl>
               </div> <!-- .tab-pane -->
             </div> <!-- .tab-content -->
+            <!-- Table start -->
+              <h5 class="card-title">Архив показаний на {% today %}</h5>
+              <table class="table table-sm table-bordered table-hover mb-0 scrollable-table">
+                <thead>
+                  <tr>
+                    <th class="number-column">№</th>
+                    <th>Время</th>
+                    <th>Выработка</th>
+                    <!-- <th>Выработка за сегодня</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for info in modal_info %} 
+                  {% if inverter.serial_number == info.serial_number %}
+                  {% for data in info.data_list %} 
+                  <tr>
+                    <td class="number-column">{{ forloop.counter }}</td>
+                    <td>{{ data.create_date|dates }}</td>
+                    <td><strong>{{ data.data}} Вт</strong> </td>
+                  </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            <!-- Table end -->
           </div>
         </div>
       </div>

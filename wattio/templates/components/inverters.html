@@ -57,7 +57,7 @@
                             <p class="medium"><strong class="card-title my-0"><span class="badge badge-info">{{ inverter.serial_number }}</span></strong></p>
                             <p class="medium text mb-0"><strong>Всего выработано - {{ inverter.inverter_registers_data.total_generate_energy.data }} кВт*ч</strong></p>
                             <p class="medium text mb-0"><strong>Время работы (всего) - {{ inverter.inverter_registers_data.work_time_total.data }} ч</strong></p>
-                            <p class="medium text mb-0"><strong>Активная мощность - {{ inverter.inverter_registers_data.current_power.data }} Вт</strong></p>
+                            <p class="medium text mb-0"><strong>Текущая выработка - {{ inverter.inverter_registers_data.current_power.data }} Вт</strong></p>
                         </div>
                     </div> <!-- ./card-text -->
                     {% include 'status/solax.html' %}
@@ -66,6 +66,7 @@
                     </div>
                 </div> <!-- .col -->
                 {% endif%}
+                {% include 'components/info.html' %}
                 {% endfor %}
                 {% endfor %}
             </div> <!-- .row -->
