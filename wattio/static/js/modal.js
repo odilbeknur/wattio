@@ -1,49 +1,74 @@
 document.addEventListener('DOMContentLoaded', function () {
     $('.modal-shortcut').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
-        var name = button.data('name'); 
-        var model = button.data('model');
         var serial = button.data('serial');
-        var totalEnergy = button.data('total-energy');
-        var workTime = button.data('work-time');
-        var todayEnergy = button.data('today-generate-energy');
-        var temperature = button.data('temperature'); 
-        var currentPower = button.data('current-power');
-        var status = button.data('status');
-        
-        
-        // Update the modal's content
-        var modal = $(this);
-        modal.find('#modalName').text(name);
-        modal.find('#modalModel').text(model);
-        modal.find('#modalSerial').text(serial);
-        modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');
-        modal.find('#modalTodayEnergy').text(todayEnergy + ' кВт·ч');
-        modal.find('#modalTemperature').text(temperature + ' ℃');
-        modal.find('#modalCurrentPower').text(currentPower + ' Вт');
-        modal.find('#modalTotalEnergy').text(totalEnergy + ' кВт·ч');
-        modal.find('#modalWorkTime').text(workTime + ' ч');
-        
-        // Set status text based on status value
-        var statusText = '';
-        var statusClass = '';
-        if (status == '1') {
-            statusText = 'Online';
-            statusClass = 'text-success';
-        } else if (status == '0') {
-            statusText = 'Waiting';
-            statusClass = 'text-secondary';
-        } else if (status == '3') {
-            statusText = 'Fault';
-            statusClass = 'text-danger';
-        }
-        modal.find('#modalStatus').html('<span class="' + statusClass + '">' + statusText + '</span>');
-       
-       // Construct the URL dynamically
-       var baseUrl = "{% url 'inverter' dummy_serial %}";  // Generates a URL like /inverter/dummy_serial/
-       var detailUrl = baseUrl.replace('dummy_serial', serial);  // Replaces 'dummy_serial' with the actual serial number
 
-       var modalLink = document.getElementById('modalLink');
-            modalLink.href = '/inverter/' + serial;
+        // Construct the URL dynamically
+        var baseUrl = "http://10.20.6.30:8080/data/chart/day/{serial_number}/yyyy-mm-dd"; 
+        var todayDate = new Date().toISOString().split('T')[0]; // Get today's date in yyyy-mm-dd format
+        var detailUrl = baseUrl.replace('{serial_number}', serial).replace('yyyy-mm-dd', todayDate); // Replace placeholders with actual values
+
+        // Fetch data from the API
+        fetch(detailUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Update the modal's content
+                var modal = $(this);
+                modal.find('#modalName').text(button.data('name'));
+                modal.find('#modalModel').text(button.data('model'));
+                modal.find('#modalSerial').text(serial);
+                modal.find('#modalTotalEnergy').text(button.data('total-energy') + ' кВт·ч');
+                modal.find('#modalTodayEnergy').text(button.data('today-generate-energy') + ' кВт·ч');
+                modal.find('#modalTemperature').text(button.data('temperature') + ' ℃');
+                modal.find('#modalCurrentPower').text(button.data('current-power') + ' Вт');
+                modal.find('#modalTotalEnergy').text(button.data('total-energy') + ' кВт·ч');
+                modal.find('#modalWorkTime').text(button.data('work-time') + ' ч');
+
+                // Set status text based on status value
+                var statusText = '';
+                var statusClass = '';
+                if (button.data('status') == '1') {
+                    statusText = 'Online';
+                    statusClass = 'text-success';
+                } else if (button.data('status') == '0') {
+                    statusText = 'Waiting';
+                    statusClass = 'text-secondary';
+                } else if (button.data('status') == '3') {
+                    statusText = 'Fault';
+                    statusClass = 'text-danger';
+                }
+                modal.find('#modalStatus').html('<span class="' + statusClass + '">' + statusText + '</span>');
+
+                // Update the table with fetched data
+                var tableBody = modal.find('#dataTable');
+                tableBody.empty(); // Clear existing rows
+
+                data.data_list.forEach(function (item, index) {
+                    // Create a Date object from the item.create_date
+                    var date = new Date(item.create_date);
+                
+                    // Add 5 hours to the date object
+                    date.setHours(date.getHours() + 5);
+                
+                    // Format the date to HH:MM
+                    var formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                
+                    // Create a row for the table
+                    var row = `<tr>
+                        <td class="number-column">${index + 1}</td>
+                        <td>${formattedTime}</td>
+                        <td><strong>${item.data} Вт</strong></td>
+                    </tr>`;
+                
+                    // Append the row to the table body
+                    tableBody.append(row);
+                });
+                
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        // Update the modal link
+        var modalLink = document.getElementById('modalLink');
+        modalLink.href = '/inverter/' + serial;
     });
 });

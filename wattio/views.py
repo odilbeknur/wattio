@@ -165,6 +165,7 @@ def inverter_view(request, serial_number):
     # Fetch access token and prepare headers
     token = get_access_token(request)
     headers = {'Authorization': f'Bearer {token}'}
+    today_date = datetime.today().strftime('%Y-%m-%d')
     
     # Fetch inverters data from API
     inverters, redirect_view = fetch_data_from_api('http://10.20.6.30:8080/inverter/', headers)
@@ -190,8 +191,10 @@ def inverter_view(request, serial_number):
 
     # check if the serial number exists in the local database
     local_inverter = Inverter.objects.filter(serial=serial_number).first()
+    info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
 
     context = {
+        'modal_info': info,
         'inverter': last_data,
         'info': local_inverter,  # Optional, if you need to display or use local data
         'plants': Plant.objects.all()

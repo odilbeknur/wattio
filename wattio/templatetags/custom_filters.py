@@ -14,8 +14,8 @@ def format_datetime(value):
     if isinstance(value, datetime):
         # Add 5 hours to the datetime object
         value += timedelta(hours=5)
-        # Format datetime with AM/PM
-        return value.strftime('%I:%M %p')
+        # Format datetime in 24-hour format
+        return value.strftime('%H:%M')
     return value
 
 @register.simple_tag(name='today')
