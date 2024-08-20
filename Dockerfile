@@ -1,23 +1,25 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# Use a lightweight Python image
+FROM python:3.12.4-slim
 
-# Set the working directory in the container
-WORKDIR /app
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Copy the requirements file into the container
-COPY requirements.txt /app/
+# Set the working directory
+WORKDIR /code
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+COPY requirements.txt /code/
+RUN pip install -r requirements.txt
 
-# Copy the rest of the application code into the container
-COPY . /app/
+# Copy project files
+COPY . /code/
 
-# Expose port 8000 for the application
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Expose the port
 EXPOSE 8000
 
-# Define environment variable
-ENV DJANGO_SETTINGS_MODULE=wattio.settings
-
-# Run Django migrations and start the application
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# Run the server with Gunicorn
+CMD ["gunicorn", "--config", "gunicorn_config.py", "config.wsgi:application"]
