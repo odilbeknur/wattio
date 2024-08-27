@@ -13,6 +13,14 @@
                                             <a class="nav-link active" id="day-tab" data-toggle="pill" href="#day"
                                                 role="tab" aria-controls="day" aria-selected="true">По дням</a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="month-tab" data-toggle="pill" href="#month"
+                                                role="tab" aria-controls="month" aria-selected="false">По месяцам</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="year-tab" data-toggle="pill" href="#year" role="tab"
+                                                aria-controls="year" aria-selected="false">По годам</a>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-3 col-lg-6 mb-4">
@@ -20,7 +28,8 @@
                                         class="calendar-controls d-flex justify-content-center align-items-center mb-3">
                                         <button type="button" id="prev-date" class="fc-prev-button btn"
                                             aria-label="prev"><span class="fe fe-chevron-left"></span></button>
-                                        <input type="date" id="datepicker" class="form-control  col-md-2 ">
+                                        <input type="date" id="datepicker" value="" class="form-control col-md-2"
+                                            autocomplete="off">
                                         <button type="button" id="next-date" class="fc-next-button btn"
                                             aria-label="next"><span class="fe fe-chevron-right"></span></button>
                                     </div>
@@ -29,13 +38,13 @@
                         </div>
                         <div class="tab-content mb-1" id="pills-tabContent">
                             <div class="tab-pane fade active show" id="day" role="tabpanel" aria-labelledby="day-tab">
-                                {% include 'widgets/linechart.html'%} 
+                                {% include 'widgets/linechart.html' %}
                             </div>
                             <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
-                                {% include 'widgets/columnchartmonth.html'%} 
-                            </div> 
-                            <div class="tab-pane fade" id="year" role="tabpanel" aria-labelledby="year-tab">  
-                                {% include 'widgets/columnchartyear.html'%}
+                                {% include 'widgets/columnchartmonth.html' %}
+                            </div>
+                            <div class="tab-pane fade" id="year" role="tabpanel" aria-labelledby="year-tab">
+                                {% include 'widgets/columnchartyear.html' %}
                             </div>
                         </div>
                     </div> <!-- /.card -->
@@ -44,3 +53,74 @@
         </div> <!-- .col-12 -->
     </div> <!-- .row -->
 </div> <!-- .container-fluid -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const datepicker = document.getElementById('datepicker');
+        const prevButton = document.getElementById('prev-date');
+        const nextButton = document.getElementById('next-date');
+
+        let currentMode = 'day'; // Track the current mode: 'day', 'month', or 'year'
+        let currentDate = new Date(); // Initialize with the current date
+
+        // Function to update the date input value based on the current mode
+        function updateDateInput() {
+            if (currentMode === 'day') {
+                // Format as YYYY-MM-DD
+                datepicker.value = currentDate.toISOString().split('T')[0];
+            } else if (currentMode === 'month') {
+                // Format as YYYY-MM (common format for month selection)
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const year = currentDate.getFullYear();
+                datepicker.value = `${year}-${month}`;
+            } else if (currentMode === 'year') {
+                // Format as YYYY
+                datepicker.value = currentDate.getFullYear().toString();
+            }
+
+            // Optional: Remove or comment out the following lines in production
+            console.log('Current mode:', currentMode);
+            console.log('Date picker value:', datepicker.value);
+        }
+        
+        // Event listeners for tab changes
+        document.getElementById('day-tab').addEventListener('click', function () {
+            currentMode = 'day';
+            updateDateInput();
+        });
+        document.getElementById('month-tab').addEventListener('click', function () {
+            currentMode = 'month';
+            updateDateInput();
+        });
+        document.getElementById('year-tab').addEventListener('click', function () {
+            currentMode = 'year';
+            updateDateInput();
+        });
+
+        // Event listeners for the prev and next buttons
+        prevButton.addEventListener('click', function () {
+            if (currentMode === 'day') {
+                currentDate.setDate(currentDate.getDate() - 1); // Go back one day
+            } else if (currentMode === 'month') {
+                currentDate.setMonth(currentDate.getMonth() - 1); // Go back one month
+            } else if (currentMode === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() - 1); // Go back one year
+            }
+            updateDateInput();
+        });
+        nextButton.addEventListener('click', function () {
+            if (currentMode === 'day') {
+                currentDate.setDate(currentDate.getDate() + 1); // Go forward one day
+            } else if (currentMode === 'month') {
+                currentDate.setMonth(currentDate.getMonth() + 1); // Go forward one month
+            } else if (currentMode === 'year') {
+                currentDate.setFullYear(currentDate.getFullYear() + 1); // Go forward one year
+            }
+            updateDateInput();
+        });
+        // Initialize the date input with the current date
+        updateDateInput();
+    });
+
+
+</script>

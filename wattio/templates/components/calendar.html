@@ -145,8 +145,12 @@
                   newDate = new Date(currentDate.setDate(currentDate.getDate() + direction));
                   fp.set('dateFormat', 'Y-m-d');
               } else if (monthBtn.classList.contains('active')) {
-                  newDate = new Date(currentDate.setMonth(currentDate.getMonth() + direction));
-                  fp.set('dateFormat', 'Y-m');
+                const fp = flatpickr(".date", {
+                defaultDate: new Date(currentDate.setDate(currentDate.getDate() + direction)),
+                plugins: [
+                    new monthSelectPlugin({})
+                ],
+                });
               } else if (yearBtn.classList.contains('active')) {
                   newDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + direction));
                   fp.set('dateFormat', 'Y');

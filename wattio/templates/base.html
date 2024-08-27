@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -19,6 +19,11 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
     <link rel="stylesheet" href="{% static 'css/calendar.css' %}" id="lightTheme">
+    <link rel="stylesheet" href="{% static 'css/monthSelect.css' %}" id="lightTheme">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/plugins/monthSelect/index.js"></script>
     {% block heads%}
     {% endblock%}
 </head>
@@ -48,9 +53,9 @@
 
     <script src="{% static 'js/gauge.min.js' %}"></script>
     <script src="{% static 'js/jquery.sparkline.min.js' %}"></script>
-    
+
     <script src="{% static 'js/modal.js' %}"></script>
-    
+
     {% block scripts %}
 
     {% endblock %}
