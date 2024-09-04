@@ -35,7 +35,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "5050:8080"
 
   nginx:
     build: ./nginx
