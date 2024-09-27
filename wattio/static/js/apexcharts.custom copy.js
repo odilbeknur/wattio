@@ -299,16 +299,7 @@ var barChart, barChartoptions = {
     barChartCtn = document.querySelector("#barChart");
 barChartCtn && (barChart = new ApexCharts(barChartCtn, barChartoptions)).render();
 var lineChart, lineChartoptions = {
-        series: [{
-            name: "Page views",
-            data: [31, 28, 30, 51, 42, 109, 100, 31, 40, 28, 31, 58, 30, 51, 42, 109, 100, 116]
-        }, {
-            name: "Visitors",
-            data: [11, 45, 20, 32, 34, 52, 41, 11, 32, 45, 11, 75, 20, 32, 34, 52, 41, 81]
-        }, {
-            name: "Orders",
-            data: [5, 25, 9, 14, 14, 32, 21, 5, 12, 25, 5, 55, 9, 14, 14, 32, 21, 65]
-        }],
+        series: [],
         chart: {
             height: 350,
             type: "line",

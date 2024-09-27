@@ -344,7 +344,6 @@ async function fetchDataAndUpdateChart() {
         const apiURL = `${apiBaseURL}?start_date=${dateValue}`;
         const response = await fetch(apiURL);
         const dataList = await response.json();
-        console.log(dataList)
         // Check if dataList contains labels and data
         if (dataList.labels && dataList.data) {
             const lineChartCtn = document.querySelector("#lineChart");
