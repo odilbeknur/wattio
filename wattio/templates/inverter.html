@@ -26,6 +26,7 @@
           <!-- <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><span class="fe fe-filter fe-16 text-muted"></span></button> -->
       </div>
       </div>
+      <div id="plant-api" data-location="{{ api_base_url }}"></div>
       <div class="card shadow my-4">
         <div class="card-body">
           <div class="row align-items-center my-4">
@@ -41,7 +42,7 @@
                   {% endif %}
                 </div>
                 <strong class="mb-0 text-uppercase text-muted">Серийный номер</strong><br />
-                <h3 id="serial_number">{{ inverter.serial_number }}</h3>
+                <h3 id="serial_number" data-location="{{ inverter.serial_number }}">{{ inverter.serial_number }}</h3>
                 <p class="text-muted">Основные показатели работы инвертора</p>
               </div>
               <div class="row align-items-center">
@@ -53,15 +54,6 @@
                     <p class="small mb-0">
                       <span class="fe fe-arrow-up text-success fe-12"></span>
                       <span class="text-muted ml-1">+1.5%</span>
-                    </p>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="p-4">
-                    <p class="small text-uppercase text-muted mb-0">Время работы (всего)</p>
-                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.work_time_total.data }} - ч</span>
-                    <p class="small mb-0">
-                      <span class="fe fe-arrow-up text-success fe-12"></span>
                     </p>
                   </div>
                 </div>

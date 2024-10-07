@@ -6,6 +6,8 @@ import requests
 from .decorators import login_required
 from .forms import InverterForm, PlantForm
 from .models import *
+from django.shortcuts import get_object_or_404
+from django.db.models import Sum
 
 def login(request):
     if 'access_token' in request.session:
@@ -74,22 +76,32 @@ def inverter_create(request):
 def get_access_token(request):
     return request.session.get('access_token')
 
-def fetch_data_from_api(url, headers):
-    response = requests.get(url, headers=headers)
-    if response.status_code == 401:
-        new_token = refresh_token(request)
-        if new_token:
-            headers['Authorization'] = f'Bearer {new_token}'
-            response = requests.get(url, headers=headers)
-        else:
-            return None, 'logout'
-    if response.status_code != 200:
-        return None, 'logout'
-    return response.json(), None
+# def fetch_data_from_api(url, headers):
+#     response = requests.get(url, headers=headers)
+#     if response.status_code == 401:
+#         new_token = refresh_token(request)
+#         if new_token:
+#             headers['Authorization'] = f'Bearer {new_token}'
+#             response = requests.get(url, headers=headers)
+#         else:
+#             return None, 'logout'
+#     if response.status_code != 200:
+#         return None, 'logout'
+#     return response.json(), None
+
+def fetch_data_from_api(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad responses
+        return response.json(), None
+    except requests.RequestException as e:
+        print(f"Error fetching data from {url}: {e}")
+        return None, str(e)
+
 
 def get_inverters_data(token):
     headers = {'Authorization': f'Bearer {token}'}
-    inverters, redirect_view = fetch_data_from_api('http://10.20.6.30:8080/inverter/', headers)
+    inverters, redirect_view = fetch_data_from_api('http://10.20.96.35:8080/inverter/')
     if redirect_view:
         return None, redirect_view
 
@@ -98,7 +110,7 @@ def get_inverters_data(token):
     inverters_data = []
     for inverter in inverters:
         serial_number = inverter.get('serial_number')
-        last_data, _ = fetch_data_from_api(f'http://10.20.6.30:8080/data/last/{serial_number}', headers)
+        last_data, _ = fetch_data_from_api(f'http://10.20.6.30:8080/data/last/{serial_number}')
         if last_data:
             last_data.update({
                 'name': inverter.get('name'),
@@ -121,39 +133,88 @@ def filter_data(data_list, filter_date):
     return filtered_data
 
 def index(request):
-    token = get_access_token(request)
-    data, redirect_view = get_inverters_data(token)
-    today_date = datetime.today().strftime('%Y-%m-%d')
+    total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
+    formatted_total_power = round(total_power, 2)
 
-    if redirect_view:
-        return redirect(redirect_view)
 
-    # Handle form submission
-    if request.method == 'POST':
-        form = InverterForm(request.POST, request.FILES, serial_choices=data['serial_choices'])
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = InverterForm(serial_choices=data['serial_choices'])
-
-    info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
+    
     context = {
-        'modal_info': info,
-        'widgets_serial': Inverter.objects.all(),
+        'total_power': formatted_total_power,
         'plants': Plant.objects.all(),
-        'inverters_data': data['inverters_data'],
-        'form': form
     }
 
     return render(request, 'index.html', context)
+    
+
+def plants_view(request):
+    context = {
+        'plants': Plant.objects.all(),
+    }
+    return render(request, 'plants.html', context)
+
+def plant_detail(request, pk):
+    plant = get_object_or_404(Plant, pk=pk)
+
+    if plant.address == "АО ТЭС":
+        api_base_url = 'http://10.20.6.30:8080'
+    elif plant.address == "TASHKENT_TTC":
+        api_base_url = 'http://10.20.96.35:8080'
+    else:
+        api_base_url = 'http://10.20.6.30:8080'
+
+    # Fetch inverters data
+    inverter_response = requests.get(f'{api_base_url}/inverter/')
+    inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+
+    # Check if the request was successful
+    if inverter_response.status_code == 200:
+        inverters = inverter_response.json()
+    else:
+        print("Inverter Response Error:", inverter_response.content)
+        inverters = []  
+
+    # Prepare a list to hold the data for each inverter
+    inverters_data = []
+
+    # Fetch last data for each inverter
+    for inverter in inverters:
+        serial_number = inverter['serial_number']
+        data_response = requests.get(f'{api_base_url}/data/last/{serial_number}')
+        if data_response.status_code == 200:
+            data = data_response.json()
+            # Check if data is not None and contains the expected structure
+            if data and 'inverter_registers_data' in data:
+                inverter_data = {
+                    'serial_number': serial_number,
+                    'data': data['inverter_registers_data']
+                }
+            else:
+                print(f"Unexpected data format for {serial_number}:", data)
+                inverter_data = {'serial_number': serial_number, 'data': {}}
+        else:
+            print(f"Data Response Error for {serial_number}:", data_response.content)
+            inverter_data = {'serial_number': serial_number, 'data': {}}
+
+        # Append inverter data to the list
+        inverters_data.append(inverter_data)
+        print(inverters)
+
+    context = {
+        "inverters": inverters,
+        'inverters_data': inverters_data,
+        'plant': plant,
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url, 
+    }
+
+    # Render the plant_detail template
+    return render(request, 'plant_detail.html', context)
 
 def plant_view(request):
     token = get_access_token(request)
     data, redirect_view = get_inverters_data(token)
     if redirect_view:
         return redirect(redirect_view)
-
     context = {
         'inverters_data': data['inverters_data'],
         'plants': Plant.objects.all(),
@@ -162,13 +223,18 @@ def plant_view(request):
     return render(request, 'plants.html', context)
 
 def inverter_view(request, serial_number):
-    # Fetch access token and prepare headers
-    token = get_access_token(request)
-    headers = {'Authorization': f'Bearer {token}'}
     today_date = datetime.today().strftime('%Y-%m-%d')
-    
+
+    inverter = get_object_or_404(Inverter, serial=serial_number)
+
+    if inverter.plant.address == "АО ТЭС":
+        api_base_url = 'http://10.20.6.30:8080'
+    elif inverter.plant.address == "TASHKENT_TTC":
+        api_base_url = 'http://10.20.96.35:8080'
+    else:
+        api_base_url = 'http://10.20.6.30:8080'
     # Fetch inverters data from API
-    inverters, redirect_view = fetch_data_from_api('http://10.20.6.30:8080/inverter/', headers)
+    inverters, redirect_view = fetch_data_from_api(f'{api_base_url}/inverter/')
     if redirect_view:
         return redirect(redirect_view)
     
@@ -182,7 +248,8 @@ def inverter_view(request, serial_number):
         return render(request, 'error.html', {'message': 'Inverter not found in API data.'})
 
     # Fetch additional data for the specific inverter
-    last_data, _ = fetch_data_from_api(f'http://10.20.6.30:8080/data/last/{serial_number}', headers)
+    last_data, _ = fetch_data_from_api(f'{api_base_url}/data/last/{serial_number}')
+
     if last_data:
         last_data.update({
             'name': inverter_data.get('name'),
@@ -191,13 +258,13 @@ def inverter_view(request, serial_number):
 
     # check if the serial number exists in the local database
     local_inverter = Inverter.objects.filter(serial=serial_number).first()
-    info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
-
+    info = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}').json()
     context = {
         'modal_info': info,
         'inverter': last_data,
-        'info': local_inverter,  # Optional, if you need to display or use local data
-        'plants': Plant.objects.all()
+        'info': local_inverter,  
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url
     }
     return render(request, 'inverter.html', context)
 
@@ -208,3 +275,42 @@ handler404 = custom_404
 
 def date(request):
     return render(request, 'date.html')
+
+
+
+
+# def index(request):
+#     token = get_access_token(request)
+#     data, redirect_view = get_inverters_data(token)
+#     today_date = datetime.today().strftime('%Y-%m-%d')
+
+#     if redirect_view:
+#         return redirect(redirect_view)
+
+#     # Handle form submission
+#     # if request.method == 'POST':
+#     #     form = InverterForm(request.POST, request.FILES, serial_choices=data['serial_choices'])
+#     #     if form.is_valid():
+#     #         form.save()
+#     #         return redirect('index')
+#     # else:
+#     #     form = InverterForm(serial_choices=data['serial_choices'])
+
+#     if request.method == 'POST':
+#         form = PlantForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('index')  # Replace with your desired redirect URL
+#     else:
+#         form = PlantForm()
+
+#     info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
+#     context = {
+#         'modal_info': info,
+#         'widgets_serial': Inverter.objects.all(),
+#         'plants': Plant.objects.all(),
+#         'inverters_data': data['inverters_data'],
+#         'form': form
+#     }
+
+#     return render(request, 'index.html', context)

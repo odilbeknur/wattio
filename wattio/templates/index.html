@@ -5,9 +5,8 @@
 <link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
 {% endblock%}
 {% block main %}
-  {% include 'components/inverters.html' %}
-  {% include 'widgets/charts.html' %}
-  {% include 'components/add.html' %}
+  {% include 'components/analytics.html' %}
+
 {% endblock main %}   
 
 {% block scripts %}
@@ -16,10 +15,16 @@
             window.location.reload();
         }, 5 * 60 * 1000);
 </script>
+
 <!-- <script src="{% static 'js/calendar.js' %}"></script> -->
-<script src="{% static 'js/apexcharts.min.js' %}"></script>
+<!-- <script src="{% static 'js/apexcharts.min.js' %}"></script>
 <script src="{% static 'js/apexcharts.custom.js' %}"></script>
-<script src="{% static 'js/flatpickr.min.js' %}"></script>
-<!-- <script src="{% static 'js/flatpickr.custom.js' %}"></script> -->
+<script src="{% static 'js/flatpickr.min.js' %}"></script> -->
+
+<!-- Datamaps -->
+<!-- <script src="{% static 'js/d3.min.js' %}"></script>
+<script src="{% static 'js/datamaps.all.min.js' %}"></script>
+<script src="{% static 'js/datamaps-zoomto.js' %}"></script>
+<script src="{% static 'js/datamaps.custom.js' %}"></script> -->
 
 {% endblock %}

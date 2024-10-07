@@ -1,57 +1,46 @@
 {% extends 'base.html' %}
+{% load static %}
 
+{% block heads%}
+<link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
+{% endblock%}
 {% block main %}
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-12">
-            <h2 class="mb-2 page-title">Список инверторов</h2>
-            <p class="card-text"> </p>
-            <div class="row my-4">
-                <!-- Small table -->
-                <div class="col-md-12">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <!-- table -->
-                            <table class="table datatables" id="dataTable-1">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Название</th>
-                                        <th>Модель</th>
-                                        <th>Серийный номер</th>
-                                        <th>Температура</th>
-                                        <th>Всего выработано</th>
-                                        <th>Выработка за сегодня</th>
-                                        <th>Время работы</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for inverter in inverters_data %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ inverter.name }}</td>
-                                        <td>{{ inverter.registers }}</td>
-                                        <td><a href="{% url 'inverter' serial_number=inverter.serial_number %}">{{ inverter.serial_number }}</a></td>
-                                        <td>{{ inverter.inverter_registers_data.temperature.data }} ℃   </td>
-                                        <td>{{ inverter.inverter_registers_data.total_generate_energy.data }} кВт*ч</td>
-                                        <td>{{ inverter.inverter_registers_data.today_generate_energy.data }} кВт*ч</td>
-                                        <td>{{ inverter.inverter_registers_data.work_time_total.data }} ч</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div> <!-- simple table -->
-            </div> <!-- end section -->
-        </div> <!-- .col-12 -->
+      <div class="col-12">
+        <div class="row align-items-center my-4">
+          <div class="col">
+            <h2 class="h3 mb-0 page-title">Станции</h2>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-primary"><span class="fe fe-plus fe-12 mr-2"></span>Добавить</button>
+          </div>
+        </div>
+        <div class="row">
+          {% for plant in plants%}
+          <div class="col-md-2">
+            <a href="{% url 'plant_detail' plant.pk %}" class="text-decoration-none card-link">
+                
+              <div class="card shadow mb-4 hover-card">
+                <!-- Card Header for Cover Image -->
+                <div class="card-header p-0">
+                  <img src="{{ plant.image.url }}" alt="Cover Image" class="img-fluid rounded-top">
+                </div>
+                <div class="card-body text-center"> 
+                  <div class="card-text my-2">
+                    <strong class="card-title my-0"><h4>{{ plant.name }}</h4></strong>
+                    <p class="small text-muted mb-0"><span class="badge badge-info">{{ plant.power }} кВт</span></p>
+                    <p class="small">
+                      <span class="badge badge-light text-muted">{{ plant.city }}</span>
+                    </p>
+                  </div>
+                </div> <!-- ./card-body -->
+              </div> <!-- ./card -->
+            </a>
+          </div> <!-- .col -->
+          {% endfor %}
+        </div> <!-- .row -->
+      </div> <!-- .col-12 -->
     </div> <!-- .row -->
-</div> <!-- .container-fluid -->
-{% endblock main %}   
-{% block scripts %}
-<script>
-  setInterval(function() {
-            window.location.reload();
-        }, 5 * 60 * 1000);
-</script>
-{% endblock %}
+  </div>
+{% endblock main %}

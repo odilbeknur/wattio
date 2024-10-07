@@ -1,4 +1,4 @@
-<div class="modal fade" id="varyModal" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="varyModal" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -13,6 +13,78 @@
                     {{ form.as_p }}
                     <button type="submit" class="btn btn-primary">Сохранить</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div> -->
+<div class="modal fade" id="plantModal" tabindex="-1" role="dialog" aria-labelledby="plantModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="plantModalLabel">Добавить станцию</h5>  
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" method="post" action="{% url 'index' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_name">Название станции</label>
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_power">Общая мощность (кВт)</label>
+                            {{ form.power }}
+                            {{ form.power.errors }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_country">Страна</label>
+                            {{ form.country }}
+                            {{ form.country.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_city">Город</label>
+                            {{ form.city }}
+                            {{ form.city.errors }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_address">Адрес</label>
+                            {{ form.address }}
+                            {{ form.address.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_time_zone">Часовой пояс</label>
+                            {{ form.time_zone }}
+                            {{ form.time_zone.errors }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_longitude">Долгота</label>
+                            {{ form.longitude }}
+                            {{ form.longitude.errors }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_latitude">Широта</label>
+                            {{ form.latitude }}
+                            {{ form.latitude.errors }}
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_plant_image">Изображение станции</label>
+                        {{ form.plant_image }}
+                        {{ form.plant_image.errors }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </form>
+                
             </div>
         </div>
     </div>

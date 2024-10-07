@@ -14,7 +14,8 @@ urlpatterns = [
 
     path('test/', test, name='test'),
     path('add-inverter/', inverter_create, name='add_inverter'),
-    path('plants/', plant_view, name='plants'),
+    path('plants/', plants_view, name='plants'),
+    path('plant/<int:pk>/', plant_detail, name='plant_detail'),
     path('inverter/<str:serial_number>/', inverter_view, name='inverter'),
     
    ]

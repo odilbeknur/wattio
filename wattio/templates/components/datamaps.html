@@ -1,0 +1,204 @@
+{% load static %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="{% static 'js/datamaps.world.min.js' %}"></script>
+<script src="{% static 'js/datamaps.uzb.js' %}"></script>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                  <div class="card-body">
+                    <div class="card-title">
+                      <strong>Products</strong>
+                      <a class="float-right small text-muted" href="#!">View all</a>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div id="chart-box" style="position: relative;">
+                          <div id="donutChartWidget" style="min-height: 182.75px;"><div id="apexchartsdd62l0ftg" class="apexcharts-canvas apexchartsdd62l0ftg apexcharts-theme-light" style="width: 1013px; height: 182.75px;"><svg id="SvgjsSvg1242" width="1013" height="182.75" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" style="background: transparent;"><g id="SvgjsG1244" class="apexcharts-inner apexcharts-graphical" transform="translate(429.5, 0)"><defs id="SvgjsDefs1243"><clipPath id="gridRectMaskdd62l0ftg"><rect id="SvgjsRect1246" width="161" height="179" x="-2.5" y="-0.5" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectMarkerMaskdd62l0ftg"><rect id="SvgjsRect1247" width="160" height="182" x="-2" y="-2" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><filter id="SvgjsFilter1256" filterUnits="userSpaceOnUse" width="200%" height="200%" x="-50%" y="-50%"><feFlood id="SvgjsFeFlood1257" flood-color="#000000" flood-opacity="0.45" result="SvgjsFeFlood1257Out" in="SourceGraphic"></feFlood><feComposite id="SvgjsFeComposite1258" in="SvgjsFeFlood1257Out" in2="SourceAlpha" operator="in" result="SvgjsFeComposite1258Out"></feComposite><feOffset id="SvgjsFeOffset1259" dx="1" dy="1" result="SvgjsFeOffset1259Out" in="SvgjsFeComposite1258Out"></feOffset><feGaussianBlur id="SvgjsFeGaussianBlur1260" stdDeviation="1 " result="SvgjsFeGaussianBlur1260Out" in="SvgjsFeOffset1259Out"></feGaussianBlur><feMerge id="SvgjsFeMerge1261" result="SvgjsFeMerge1261Out" in="SourceGraphic"><feMergeNode id="SvgjsFeMergeNode1262" in="SvgjsFeGaussianBlur1260Out"></feMergeNode><feMergeNode id="SvgjsFeMergeNode1263" in="[object Arguments]"></feMergeNode></feMerge><feBlend id="SvgjsFeBlend1264" in="SourceGraphic" in2="SvgjsFeMerge1261Out" mode="normal" result="SvgjsFeBlend1264Out"></feBlend></filter><filter id="SvgjsFilter1269" filterUnits="userSpaceOnUse" width="200%" height="200%" x="-50%" y="-50%"><feFlood id="SvgjsFeFlood1270" flood-color="#000000" flood-opacity="0.45" result="SvgjsFeFlood1270Out" in="SourceGraphic"></feFlood><feComposite id="SvgjsFeComposite1271" in="SvgjsFeFlood1270Out" in2="SourceAlpha" operator="in" result="SvgjsFeComposite1271Out"></feComposite><feOffset id="SvgjsFeOffset1272" dx="1" dy="1" result="SvgjsFeOffset1272Out" in="SvgjsFeComposite1271Out"></feOffset><feGaussianBlur id="SvgjsFeGaussianBlur1273" stdDeviation="1 " result="SvgjsFeGaussianBlur1273Out" in="SvgjsFeOffset1272Out"></feGaussianBlur><feMerge id="SvgjsFeMerge1274" result="SvgjsFeMerge1274Out" in="SourceGraphic"><feMergeNode id="SvgjsFeMergeNode1275" in="SvgjsFeGaussianBlur1273Out"></feMergeNode><feMergeNode id="SvgjsFeMergeNode1276" in="[object Arguments]"></feMergeNode></feMerge><feBlend id="SvgjsFeBlend1277" in="SourceGraphic" in2="SvgjsFeMerge1274Out" mode="normal" result="SvgjsFeBlend1277Out"></feBlend></filter><filter id="SvgjsFilter1282" filterUnits="userSpaceOnUse" width="200%" height="200%" x="-50%" y="-50%"><feFlood id="SvgjsFeFlood1283" flood-color="#000000" flood-opacity="0.45" result="SvgjsFeFlood1283Out" in="SourceGraphic"></feFlood><feComposite id="SvgjsFeComposite1284" in="SvgjsFeFlood1283Out" in2="SourceAlpha" operator="in" result="SvgjsFeComposite1284Out"></feComposite><feOffset id="SvgjsFeOffset1285" dx="1" dy="1" result="SvgjsFeOffset1285Out" in="SvgjsFeComposite1284Out"></feOffset><feGaussianBlur id="SvgjsFeGaussianBlur1286" stdDeviation="1 " result="SvgjsFeGaussianBlur1286Out" in="SvgjsFeOffset1285Out"></feGaussianBlur><feMerge id="SvgjsFeMerge1287" result="SvgjsFeMerge1287Out" in="SourceGraphic"><feMergeNode id="SvgjsFeMergeNode1288" in="SvgjsFeGaussianBlur1286Out"></feMergeNode><feMergeNode id="SvgjsFeMergeNode1289" in="[object Arguments]"></feMergeNode></feMerge><feBlend id="SvgjsFeBlend1290" in="SourceGraphic" in2="SvgjsFeMerge1287Out" mode="normal" result="SvgjsFeBlend1290Out"></feBlend></filter><filter id="SvgjsFilter1295" filterUnits="userSpaceOnUse" width="200%" height="200%" x="-50%" y="-50%"><feFlood id="SvgjsFeFlood1296" flood-color="#000000" flood-opacity="0.45" result="SvgjsFeFlood1296Out" in="SourceGraphic"></feFlood><feComposite id="SvgjsFeComposite1297" in="SvgjsFeFlood1296Out" in2="SourceAlpha" operator="in" result="SvgjsFeComposite1297Out"></feComposite><feOffset id="SvgjsFeOffset1298" dx="1" dy="1" result="SvgjsFeOffset1298Out" in="SvgjsFeComposite1297Out"></feOffset><feGaussianBlur id="SvgjsFeGaussianBlur1299" stdDeviation="1 " result="SvgjsFeGaussianBlur1299Out" in="SvgjsFeOffset1298Out"></feGaussianBlur><feMerge id="SvgjsFeMerge1300" result="SvgjsFeMerge1300Out" in="SourceGraphic"><feMergeNode id="SvgjsFeMergeNode1301" in="SvgjsFeGaussianBlur1299Out"></feMergeNode><feMergeNode id="SvgjsFeMergeNode1302" in="[object Arguments]"></feMergeNode></feMerge><feBlend id="SvgjsFeBlend1303" in="SourceGraphic" in2="SvgjsFeMerge1300Out" mode="normal" result="SvgjsFeBlend1303Out"></feBlend></filter><filter id="SvgjsFilter1308" filterUnits="userSpaceOnUse" width="200%" height="200%" x="-50%" y="-50%"><feFlood id="SvgjsFeFlood1309" flood-color="#000000" flood-opacity="0.45" result="SvgjsFeFlood1309Out" in="SourceGraphic"></feFlood><feComposite id="SvgjsFeComposite1310" in="SvgjsFeFlood1309Out" in2="SourceAlpha" operator="in" result="SvgjsFeComposite1310Out"></feComposite><feOffset id="SvgjsFeOffset1311" dx="1" dy="1" result="SvgjsFeOffset1311Out" in="SvgjsFeComposite1310Out"></feOffset><feGaussianBlur id="SvgjsFeGaussianBlur1312" stdDeviation="1 " result="SvgjsFeGaussianBlur1312Out" in="SvgjsFeOffset1311Out"></feGaussianBlur><feMerge id="SvgjsFeMerge1313" result="SvgjsFeMerge1313Out" in="SourceGraphic"><feMergeNode id="SvgjsFeMergeNode1314" in="SvgjsFeGaussianBlur1312Out"></feMergeNode><feMergeNode id="SvgjsFeMergeNode1315" in="[object Arguments]"></feMergeNode></feMerge><feBlend id="SvgjsFeBlend1316" in="SourceGraphic" in2="SvgjsFeMerge1313Out" mode="normal" result="SvgjsFeBlend1316Out"></feBlend></filter></defs><g id="SvgjsG1248" class="apexcharts-pie"><g id="SvgjsG1249" transform="translate(0, 0) scale(1)"><circle id="SvgjsCircle1250" r="32.73170731707318" cx="78" cy="89" fill="transparent"></circle><g id="SvgjsG1251" class="apexcharts-slices"><g id="SvgjsG1252" class="apexcharts-series apexcharts-pie-series" seriesName="Clothing" rel="1" data:realIndex="0"><path id="SvgjsPath1253" d="M 78 7.17073170731706 A 81.82926829268294 81.82926829268294 0 0 1 159.82604596989114 88.27381114774145 L 110.73041838795646 88.70952445909658 A 32.73170731707318 32.73170731707318 0 0 0 78 56.26829268292682 L 78 7.17073170731706 z" fill="rgba(27,104,255,1)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-0" index="0" j="0" data:angle="89.49152542372882" data:startAngle="0" data:strokeWidth="0" data:value="44" data:pathOrig="M 78 7.17073170731706 A 81.82926829268294 81.82926829268294 0 0 1 159.82604596989114 88.27381114774145 L 110.73041838795646 88.70952445909658 A 32.73170731707318 32.73170731707318 0 0 0 78 56.26829268292682 L 78 7.17073170731706 z"></path></g><g id="SvgjsG1265" class="apexcharts-series apexcharts-pie-series" seriesName="Shoes" rel="2" data:realIndex="1"><path id="SvgjsPath1266" d="M 159.82604596989114 88.27381114774145 A 81.82926829268294 81.82926829268294 0 0 1 48.20100658601905 165.21055793542916 L 66.08040263440762 119.48422317417166 A 32.73170731707318 32.73170731707318 0 0 0 110.73041838795646 88.70952445909658 L 159.82604596989114 88.27381114774145 z" fill="rgba(58,210,159,1)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-1" index="0" j="1" data:angle="111.86440677966102" data:startAngle="89.49152542372882" data:strokeWidth="0" data:value="55" data:pathOrig="M 159.82604596989114 88.27381114774145 A 81.82926829268294 81.82926829268294 0 0 1 48.20100658601905 165.21055793542916 L 66.08040263440762 119.48422317417166 A 32.73170731707318 32.73170731707318 0 0 0 110.73041838795646 88.70952445909658 L 159.82604596989114 88.27381114774145 z"></path></g><g id="SvgjsG1278" class="apexcharts-series apexcharts-pie-series" seriesName="Others" rel="3" data:realIndex="2"><path id="SvgjsPath1279" d="M 48.20100658601905 165.21055793542916 A 81.82926829268294 81.82926829268294 0 0 1 5.726328549355173 127.3737614048992 L 49.090531419742064 104.34950456195968 A 32.73170731707318 32.73170731707318 0 0 0 66.08040263440762 119.48422317417166 L 48.20100658601905 165.21055793542916 z" fill="rgba(111,66,193,1)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-2" index="0" j="2" data:angle="40.67796610169492" data:startAngle="201.35593220338984" data:strokeWidth="0" data:value="20" data:pathOrig="M 48.20100658601905 165.21055793542916 A 81.82926829268294 81.82926829268294 0 0 1 5.726328549355173 127.3737614048992 L 49.090531419742064 104.34950456195968 A 32.73170731707318 32.73170731707318 0 0 0 66.08040263440762 119.48422317417166 L 48.20100658601905 165.21055793542916 z"></path></g><g id="SvgjsG1291" class="apexcharts-series apexcharts-pie-series" seriesName="Electronics" rel="4" data:realIndex="3"><path id="SvgjsPath1292" d="M 5.726328549355173 127.3737614048992 A 81.82926829268294 81.82926829268294 0 0 1 31.56166130251804 21.624115231532315 L 59.424664521007216 62.049646092612925 A 32.73170731707318 32.73170731707318 0 0 0 49.090531419742064 104.34950456195968 L 5.726328549355173 127.3737614048992 z" fill="rgba(180,205,255,1)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-3" index="0" j="3" data:angle="83.3898305084746" data:startAngle="242.03389830508476" data:strokeWidth="0" data:value="41" data:pathOrig="M 5.726328549355173 127.3737614048992 A 81.82926829268294 81.82926829268294 0 0 1 31.56166130251804 21.624115231532315 L 59.424664521007216 62.049646092612925 A 32.73170731707318 32.73170731707318 0 0 0 49.090531419742064 104.34950456195968 L 5.726328549355173 127.3737614048992 z"></path></g><g id="SvgjsG1304" class="apexcharts-series apexcharts-pie-series" seriesName="Books" rel="5" data:realIndex="4"><path id="SvgjsPath1305" d="M 31.56166130251804 21.624115231532315 A 81.82926829268294 81.82926829268294 0 0 1 77.98571809851045 7.170732953648084 L 77.99428723940417 56.26829318145923 A 32.73170731707318 32.73170731707318 0 0 0 59.424664521007216 62.049646092612925 L 31.56166130251804 21.624115231532315 z" fill="rgba(27,104,255,1)" fill-opacity="1" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-4" index="0" j="4" data:angle="34.57627118644069" data:startAngle="325.42372881355936" data:strokeWidth="0" data:value="17" data:pathOrig="M 31.56166130251804 21.624115231532315 A 81.82926829268294 81.82926829268294 0 0 1 77.98571809851045 7.170732953648084 L 77.99428723940417 56.26829318145923 A 32.73170731707318 32.73170731707318 0 0 0 59.424664521007216 62.049646092612925 L 31.56166130251804 21.624115231532315 z"></path></g><g id="SvgjsG1254" class="apexcharts-datalabels"><text id="SvgjsText1255" font-family="Overpass, sans-serif" x="118.32329827145655" y="48.31725304658086" text-anchor="middle" dominant-baseline="auto" font-size="10px" font-weight="300" fill="#ffffff" class="apexcharts-text apexcharts-pie-label" filter="url(#SvgjsFilter1256)" style="font-family: Overpass, sans-serif;">24.9%</text></g><g id="SvgjsG1267" class="apexcharts-datalabels"><text id="SvgjsText1268" font-family="Overpass, sans-serif" x="110.5068370882374" y="136.16311933792736" text-anchor="middle" dominant-baseline="auto" font-size="10px" font-weight="300" fill="#ffffff" class="apexcharts-text apexcharts-pie-label" filter="url(#SvgjsFilter1269)" style="font-family: Overpass, sans-serif;">31.1%</text></g><g id="SvgjsG1280" class="apexcharts-datalabels"><text id="SvgjsText1281" font-family="Overpass, sans-serif" x="39.899076384925806" y="131.77118075109763" text-anchor="middle" dominant-baseline="auto" font-size="10px" font-weight="300" fill="#ffffff" class="apexcharts-text apexcharts-pie-label" filter="url(#SvgjsFilter1282)" style="font-family: Overpass, sans-serif;">11.3%</text></g><g id="SvgjsG1293" class="apexcharts-datalabels"><text id="SvgjsText1294" font-family="Overpass, sans-serif" x="22.35602184555679" y="75.40581086226062" text-anchor="middle" dominant-baseline="auto" font-size="10px" font-weight="300" fill="#ffffff" class="apexcharts-text apexcharts-pie-label" filter="url(#SvgjsFilter1295)" style="font-family: Overpass, sans-serif;">23.2%</text></g><g id="SvgjsG1306" class="apexcharts-datalabels"><text id="SvgjsText1307" font-family="Overpass, sans-serif" x="60.977547164279926" y="34.307309605208935" text-anchor="middle" dominant-baseline="auto" font-size="10px" font-weight="300" fill="#ffffff" class="apexcharts-text apexcharts-pie-label" filter="url(#SvgjsFilter1308)" style="font-family: Overpass, sans-serif;">9.6%</text></g></g></g></g><line id="SvgjsLine1317" x1="0" y1="0" x2="156" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" class="apexcharts-ycrosshairs"></line><line id="SvgjsLine1318" x1="0" y1="0" x2="156" y2="0" stroke-dasharray="0" stroke-width="0" class="apexcharts-ycrosshairs-hidden"></line></g><g id="SvgjsG1245" class="apexcharts-annotations"></g></svg><div class="apexcharts-legend"></div><div class="apexcharts-tooltip apexcharts-theme-dark"><div class="apexcharts-tooltip-series-group"><span class="apexcharts-tooltip-marker" style="background-color: rgb(0, 143, 251);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-label"></span><span class="apexcharts-tooltip-text-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group"><span class="apexcharts-tooltip-marker" style="background-color: rgb(0, 227, 150);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-label"></span><span class="apexcharts-tooltip-text-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group"><span class="apexcharts-tooltip-marker" style="background-color: rgb(254, 176, 25);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-label"></span><span class="apexcharts-tooltip-text-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group"><span class="apexcharts-tooltip-marker" style="background-color: rgb(255, 69, 96);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-label"></span><span class="apexcharts-tooltip-text-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group"><span class="apexcharts-tooltip-marker" style="background-color: rgb(119, 93, 208);"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-label"></span><span class="apexcharts-tooltip-text-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div></div></div></div>
+                        <div class="resize-triggers"><div class="expand-trigger"><div style="width: 1014px; height: 184px;"></div></div><div class="contract-trigger"></div></div></div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="row align-items-center my-3">
+                          <div class="col">
+                            <strong>Cloud Server</strong>
+                            <div class="my-0 text-muted small">Global, Services</div>
+                          </div>
+                          <div class="col-auto">
+                            <strong>+85%</strong>
+                          </div>
+                          <div class="col-3">
+                            <div class="progress" style="height: 4px;">
+                              <div class="progress-bar" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row align-items-center my-3">
+                          <div class="col">
+                            <strong>CDN</strong>
+                            <div class="my-0 text-muted small">Global, Services</div>
+                          </div>
+                          <div class="col-auto">
+                            <strong>+75%</strong>
+                          </div>
+                          <div class="col-3">
+                            <div class="progress" style="height: 4px;">
+                              <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row align-items-center my-3">
+                          <div class="col">
+                            <strong>Databases</strong>
+                            <div class="my-0 text-muted small">Local, DC</div>
+                          </div>
+                          <div class="col-auto">
+                            <strong>+62%</strong>
+                          </div>
+                          <div class="col-3">
+                            <div class="progress" style="height: 4px;">
+                              <div class="progress-bar" role="progressbar" style="width: 62%" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div> <!-- .col-md-12 -->
+                    </div> <!-- .row -->
+                  </div> <!-- .card-body -->
+                </div> <!-- .card -->
+              </div>
+              <div class="col-md-6">
+                <div class="card shadow mb-4">
+                  <div class="card-body">
+                    <div class="card-title">
+                      <strong>Products</strong>
+                      <a class="float-right small text-muted" href="#!">View all</a>
+                    </div>
+                    <div id="container" style="position: relative; width: 800px; height: 375px;"></div>
+                  </div> <!-- .card-body -->
+                </div> <!-- .card -->
+              </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Добавляем стили для увеличения попапов и шрифта -->
+<style>
+    .hoverinfo {
+        font-size: 18px;
+        /* Увеличиваем размер шрифта */
+        padding: 10px;
+        /* Добавляем отступы */
+        background-color: rgba(255, 255, 255, 0.9);
+        /* Белый фон с прозрачностью */
+        border: 1px solid #ccc;
+        /* Серые границы */
+        border-radius: 8px;
+        /* Закругленные углы */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        /* Тень для объема */
+        max-width: 250px;
+        /* Максимальная ширина попапа */
+    }
+</style>
+
+<script>
+    // Mapping of geographic names to Russian names
+    var regionNameMapping = {
+        "Kashkadarya": "Кашкадарья",
+        "Tashkent": "Ташкент",
+        "Samarkand": "Самарканд",
+        "Bukhoro": "Бухара",
+        "Khorezm": "Хорезм",
+        "Navoi": "Наваи",
+        "Ferghana": "Фергана",
+        "Mubarek": "Мубарек",
+        "Sirdaryo": "Сырдарья",
+        "Angren": "Ангрен",
+        "Turakurgan": "Туракурган",
+        "Namangan": "Наманган",
+        "Jizzakh": "Джизак",
+        "Surkhandarya": "Сурхандарья",
+        "Nukus": "Нукус",
+        "Karakalpakstan": "Каракалпакстан",
+        "Andijon": "Андижан",
+        "Kashkadarya": "Кашкадарья",
+        "Bukhara": "Бухара"
+        // Add more mappings as needed
+    };
+
+    var map = new Datamap({
+        element: document.getElementById('container'),
+        scope: 'uzb',  // Указываем, что отображаем Узбекистан
+        setProjection: function (element) {
+            var projection = d3.geo.mercator()
+                .center([64, 41])  // Центр Узбекистана по долготе и широте
+                .scale(1500)       // Масштабирование карты
+                .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+            var path = d3.geo.path().projection(projection);
+
+            return { path: path, projection: projection };
+        },
+        fills: {
+            defaultFill: "#ffff", // Цвет по умолчанию
+            'UZB': '#0f75fa'       // Цвет для Узбекистана
+        },
+        geographyConfig: {
+            highlightOnHover: true,
+            popupOnHover: true,
+            borderColor: '#444',
+            borderWidth: 0.5,
+            highlightFillColor: '#0f75fa',
+            highlightBorderColor: 'rgba(34,117,215,.25)',
+            // Use the mapping in the popupTemplate
+            popupTemplate: function (geo, data) {
+                // Get the correct Russian name from the mapping
+                const regionName = regionNameMapping[geo.properties.name] || geo.properties.name; // Default to original name if not found
+                return '<div class="hoverinfo">' + regionName + '</div>';
+            }
+        }
+    });
+
+    // Данные для меток на областях Узбекистана с количеством инверторов и мощностью
+    var oblasts = [
+        { name: "Ташкентcкая ТЭЦ", latitude: 41.2995, longitude: 69.2401, inverters: 12, power: 50, url: "https://example.com/tashkent" },
+        { name: "Фергана", latitude: 40.3842, longitude: 71.7843, inverters: 15, power: 60, url: "https://example.com/fergana" },
+        { name: "Мубарек", latitude: 39.2559, longitude: 65.1529, inverters: 7, power: 25, url: "https://example.com/mubarek" },
+        { name: "Сырдарьинская ТЭС", latitude: 40.8416, longitude: 68.6586, inverters: 11, power: 22, url: "https://example.com/sirdarya" },
+        { name: "Ангрен", latitude: 41.0236, longitude: 70.1431, inverters: 9, power: 35, url: "https://example.com/angren" },
+        { name: "Туракурган", latitude: 40.9983, longitude: 71.5117, inverters: 4, power: 18, url: "https://example.com/turakurgan" }
+        // Добавьте сюда другие области и их координаты
+    ];
+
+    // Добавление меток на карту
+    map.bubbles(oblasts.map(function (oblast) {
+        return {
+            name: oblast.name,
+            latitude: oblast.latitude,
+            longitude: oblast.longitude,
+            radius: 8, // Радиус круга
+            fillKey: 'UZB',
+            url: oblast.url,
+            inverters: oblast.inverters,
+            power: oblast.power
+        };
+    }), {
+        // Всплывающая подсказка при наведении (popover) с информацией о количестве инверторов и мощности
+        popupTemplate: function (geo, data) {
+            return '<div class="hoverinfo">' +
+                '<strong>' + data.name + '</strong><br>' +
+                'Количество инверторов: ' + data.inverters
+            'Общая мощность: ' + data.power + ' МВт<br>' +
+                '</div>';
+        }
+    });
+
+    // Сделать метки кликабельными
+    d3.selectAll('.datamaps-bubble').on('click', function (bubble) {
+        window.location.href = bubble.url; // Перенаправление при нажатии на метку
+    });
+</script>

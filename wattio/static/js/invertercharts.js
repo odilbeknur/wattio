@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const apiBaseURL = 'http://10.20.6.30:8080/data/chart/';
+
     const chartColors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#3F51B5", "#03A9F4", "#4CAF50", "#F9CE1D", "#FF9800"];
-    
-    const inverterSerialNumber = 'LJJ8CGA017'; // Set your inverter serial number here
+
+    var inverterSerialNumber = document.getElementById('serial_number').getAttribute('data-location');
+    apiBaseUrl = document.getElementById('plant-api').getAttribute('data-location');
+
+    console.log("BASE URL: ", apiBaseUrl)
 
     // Initialize Flatpickr for Month Picker
     const monthPicker = flatpickr("#monthpicker", {
@@ -96,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
         const monthValue = `${year}/${month}`; // Combine year and month in "YYYY/MM" format
         
-        const apiURL = `${apiBaseURL}month/${inverterSerialNumber}/${monthValue}`;
+        const apiURL = `${apiBaseUrl}/data/chart/month/${inverterSerialNumber}/${monthValue}`;
         console.log(apiURL);
         try {
             const response = await fetch(apiURL);
@@ -134,13 +137,14 @@ document.addEventListener('DOMContentLoaded', function () {
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(datePicker.selectedDates[0]);
         if (dateValue) {
-            const apiURL = `${apiBaseURL}day/${inverterSerialNumber}/${dateValue}`;
+            const apiURL = `${apiBaseUrl}/data/chart/day/${inverterSerialNumber}/${dateValue}`;
+            console.log("line chart", apiURL, apiURL)
             try {
                 const response = await fetch(apiURL);
                 const dataList = await response.json();
                 console.log(dataList.data_list.length);
                 const dataresponse = dataList.data_list;
-
+                console.log('Dataresponse: ', dataresponse)
                 if (dataresponse.length > 0) {
                     const seriesData = [{
                         name: inverterSerialNumber,
