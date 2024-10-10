@@ -1,17 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const chartColors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#3F51B5", "#03A9F4", "#4CAF50", "#F9CE1D", "#FF9800"];
-
-    var plantLocation = document.getElementById('plant-data').getAttribute('data-location');
-
-    if (plantLocation === 'АО ТЭС') {
-        apiBaseURL = "http://10.20.6.30:8080/";  // TPP API URL
-    } else if (plantLocation === 'TASHКENT_TTC') {
-        apiBaseURL = "http://10.20.96.35:8080/";  // PTT API URL
-    } else {
-        apiBaseURL = "http://10.20.6.30:8080/";  // Default API URL
-    }
-    console.log("BASE URL: ", apiBaseURL)
-    
+    apiBaseURL = document.getElementById('plant-api').getAttribute('data-location');
+       
     // Initialize Flatpickr for Month Picker
     const monthPicker = flatpickr("#monthpicker", {
         plugins: [new monthSelectPlugin({ shorthand: true, dateFormat: "Y/m", theme: "light" })],
@@ -91,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
         const monthValue = `${year}/${month}`; // Combine year and month in "YYYY/MM" format
         
-        const apiURL = `${apiBaseURL}data/chart/month/all/${monthValue}`;
+        const apiURL = `${apiBaseURL}/data/chart/month/all/${monthValue}`;
         try {
             const response = await fetch(apiURL);
             if (!response.ok) {
@@ -130,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log(dateValue)
         if (dateValue) {
-            const apiURL = `${apiBaseURL}data/chart/day/all/${dateValue}`;
+            const apiURL = `${apiBaseURL}/data/chart/day/all/${dateValue}`;
             console.log(apiURL)
 
             try {

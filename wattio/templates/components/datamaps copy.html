@@ -51,6 +51,39 @@
         // Add more mappings as needed
     };
 
+    // var map = new Datamap({
+    //     element: document.getElementById('container'),
+    //     scope: 'uzb',  // Указываем, что отображаем Узбекистан
+    //     responsive: !0,
+    //     aspectRatio: .45,
+    //     setProjection: function (element) {
+    //         var projection = d3.geo.mercator()
+    //             .center([64, 41])  // Центр Узбекистана по долготе и широте
+    //             .scale(1500)       // Масштабирование карты
+    //         var path = d3.geo.path().projection(projection);
+
+    //         return { path: path, projection: projection };
+    //     },
+    //     fills: {
+    //         defaultFill: "#ffff", // Цвет по умолчанию
+    //         'UZB': '#0f75fa'       // Цвет для Узбекистана
+    //     },
+    //     geographyConfig: {
+    //         highlightOnHover: true,
+    //         popupOnHover: true,
+    //         borderColor: '#444',
+    //         borderWidth: 0.5,
+    //         highlightFillColor: '#0f75fa',
+    //         highlightBorderColor: 'rgba(34,117,215,.25)',
+    //         // Use the mapping in the popupTemplate
+    //         popupTemplate: function (geo, data) {
+    //             // Get the correct Russian name from the mapping
+    //             const regionName = regionNameMapping[geo.properties.name] || geo.properties.name; // Default to original name if not found
+    //             return '<div class="hoverinfo">' + regionName + '</div>';
+    //         }
+    //     }
+    // });
+
     var mapUZB, mapUZBox = document.getElementById("container");
     mapUZBox && (mapUZB = new Datamap({
         element: document.getElementById('container'),
@@ -58,28 +91,13 @@
         responsive: !0,
         aspectRatio: .45,
         setProjection: function (element) {
-            // Get the width and height of the container element
-            var width = element.offsetWidth;
-            var height = element.offsetHeight;
-
-            var scale = Math.min(width, height) * 4;
-
-            var centerLongitude = 60; // Longitude of Uzbekistan
-            var centerLatitude = 39; // Latitude of Uzbekistan
-            var adaptiveLongitude = centerLongitude + (width - height) / width * 5; // Adjust for width
-            var adaptiveLatitude = centerLatitude - (height - width) / height * 2; // Adjust for height
-
-            // Define the projection with the adaptive center
             var projection = d3.geo.mercator()
-                .center([adaptiveLongitude, adaptiveLatitude])  // Adaptive center
-                .scale(scale)                                   // Dynamic scale based on element size
-                .translate([width / 2, height / 2]);             // Center the map in the container
-
+                .center([64, 41])  // Центр Узбекистана по долготе и широте
+                .scale(1500)       // Масштабирование карты
             var path = d3.geo.path().projection(projection);
 
             return { path: path, projection: projection };
         },
-
         fills: {
             defaultFill: "#ffff", // Цвет по умолчанию
             'UZB': '#0f75fa'       // Цвет для Узбекистана
@@ -98,7 +116,7 @@
                 return '<div class="hoverinfo">' + regionName + '</div>';
             }
         }
-    }), window.addEventListener("resize", function () {
+    }), window.addEventListener("resize", function() {
         mapUZB.resize()
     }));
 
@@ -113,4 +131,31 @@
         // Добавьте сюда другие области и их координаты
     ];
 
+    // Добавление меток на карту
+    map.bubbles(oblasts.map(function (oblast) {
+        return {
+            name: oblast.name,
+            latitude: oblast.latitude,
+            longitude: oblast.longitude,
+            radius: 8, // Радиус круга
+            fillKey: 'UZB',
+            url: oblast.url,
+            inverters: oblast.inverters,
+            power: oblast.power
+        };
+    }), {
+        // Всплывающая подсказка при наведении (popover) с информацией о количестве инверторов и мощности
+        popupTemplate: function (geo, data) {
+            return '<div class="hoverinfo">' +
+                '<strong>' + data.name + '</strong><br>' +
+                'Количество инверторов: ' + data.inverters
+            'Общая мощность: ' + data.power + ' МВт<br>' +
+                '</div>';
+        }
+    });
+
+    // Сделать метки кликабельными
+    d3.selectAll('.datamaps-bubble').on('click', function (bubble) {
+        window.location.href = bubble.url; // Перенаправление при нажатии на метку
+    });
 </script>

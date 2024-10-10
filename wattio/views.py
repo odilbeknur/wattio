@@ -132,18 +132,63 @@ def filter_data(data_list, filter_date):
     
     return filtered_data
 
+import requests
+from django.shortcuts import render, HttpResponse
+from django.db.models import Sum
+from .models import Plant
+
 def index(request):
+    # Sum of total power from Plant objects
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
     formatted_total_power = round(total_power, 2)
-
-
     
+    # List of API endpoints for the inverters
+    api_urls = ["http://10.20.6.30:8080/data/chart/last/all/", "http://10.20.96.35:8080/data/chart/last/all/"]
+
+    # Initialize sums for today's generated energy, total generated energy, and current power
+    total_today_generate_energy = 0
+    total_generate_energy = 0
+    total_current_power = 0
+
+    # Loop through each API endpoint and sum the values
+    for url in api_urls:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Check if the request was successful
+            data = response.json()
+            
+            # Sum values for each inverter in the response
+            for inverter in data:
+                today_energy = float(inverter["inverter_registers_data"]["today_generate_energy"]["data"])
+                total_energy = float(inverter["inverter_registers_data"]["total_generate_energy"]["data"])
+                current_power = float(inverter["inverter_registers_data"]["current_power"]["data"])
+                
+                total_today_generate_energy += today_energy
+                total_generate_energy += total_energy
+                total_current_power += current_power
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from {url}: {e}")
+        except (KeyError, ValueError) as e:
+            print(f"Error parsing data from {url}: {e}")
+
+    # Format the summed values
+    formatted_total_today_energy = round(total_today_generate_energy, 2)
+    formatted_total_generate_energy = round(total_generate_energy, 2)
+    formatted_total_current_power = round(total_current_power, 2)
+
+    # Prepare the context for rendering
     context = {
         'total_power': formatted_total_power,
+        'total_today_generate_energy': formatted_total_today_energy,
+        'total_generate_energy': formatted_total_generate_energy,
+        'total_current_power': formatted_total_current_power,
         'plants': Plant.objects.all(),
     }
 
+    # Return the rendered template with the context
     return render(request, 'index.html', context)
+
+
     
 
 def plants_view(request):
