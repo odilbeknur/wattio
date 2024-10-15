@@ -8,6 +8,7 @@ from .forms import InverterForm, PlantForm
 from .models import *
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
+import json
 
 def login(request):
     if 'access_token' in request.session:
@@ -132,18 +133,22 @@ def filter_data(data_list, filter_date):
     
     return filtered_data
 
-import requests
-from django.shortcuts import render, HttpResponse
-from django.db.models import Sum
-from .models import Plant
-
 def index(request):
     # Sum of total power from Plant objects
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
-    formatted_total_power = round(total_power, 2)
+    formatted_total_power = round(float(total_power), 2)  # Convert to float if it's a Decimal
+    plants = list(Plant.objects.values('id','name', 'inverter_count', 'latitude', 'longitude', 'power', 'image'))
+    # Convert Decimal values in plants to float
+    for plant in plants:
+        plant['power'] = float(plant['power'])  # Convert to float for JSON serialization
     
+    plants_json = json.dumps(plants)
+
     # List of API endpoints for the inverters
-    api_urls = ["http://10.20.6.30:8080/data/chart/last/all/", "http://10.20.96.35:8080/data/chart/last/all/"]
+    api_urls = [
+        "http://10.20.6.30:8080/data/chart/last/all/",
+        "http://10.20.96.35:8080/data/chart/last/all/"
+    ]
 
     # Initialize sums for today's generated energy, total generated energy, and current power
     total_today_generate_energy = 0
@@ -171,21 +176,19 @@ def index(request):
         except (KeyError, ValueError) as e:
             print(f"Error parsing data from {url}: {e}")
 
-    # Format the summed values
     formatted_total_today_energy = round(total_today_generate_energy, 2)
     formatted_total_generate_energy = round(total_generate_energy, 2)
     formatted_total_current_power = round(total_current_power, 2)
 
-    # Prepare the context for rendering
     context = {
         'total_power': formatted_total_power,
         'total_today_generate_energy': formatted_total_today_energy,
         'total_generate_energy': formatted_total_generate_energy,
         'total_current_power': formatted_total_current_power,
-        'plants': Plant.objects.all(),
+        'plants': plants,  
+        'plants_json': plants_json
     }
 
-    # Return the rendered template with the context
     return render(request, 'index.html', context)
 
 

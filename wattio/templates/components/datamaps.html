@@ -48,13 +48,12 @@
         "Andijon": "Андижан",
         "Kashkadarya": "Кашкадарья",
         "Bukhara": "Бухара"
-        // Add more mappings as needed
     };
 
     var mapUZB, mapUZBox = document.getElementById("container");
     mapUZBox && (mapUZB = new Datamap({
         element: document.getElementById('container'),
-        scope: 'uzb',  // Указываем, что отображаем Узбекистан
+        scope: 'uzb',
         responsive: !0,
         aspectRatio: .45,
         setProjection: function (element) {
@@ -62,7 +61,7 @@
             var width = element.offsetWidth;
             var height = element.offsetHeight;
 
-            var scale = Math.min(width, height) * 4;
+            var scale = Math.min(width, height)*4;
 
             var centerLongitude = 60; // Longitude of Uzbekistan
             var centerLatitude = 39; // Latitude of Uzbekistan
@@ -82,7 +81,13 @@
 
         fills: {
             defaultFill: "#ffff", // Цвет по умолчанию
-            'UZB': '#0f75fa'       // Цвет для Узбекистана
+            'UZB': '#0f75fa',    
+            'Tashkent': '#0f75fa',
+        },
+        data: {
+        Tashkent: {
+            fillKey: 'TASHKENT'
+        }
         },
         geographyConfig: {
             highlightOnHover: true,
@@ -102,15 +107,34 @@
         mapUZB.resize()
     }));
 
-    // Данные для меток на областях Узбекистана с количеством инверторов и мощностью
-    var oblasts = [
-        { name: "Ташкентcкая ТЭЦ", latitude: 41.2995, longitude: 69.2401, inverters: 12, power: 50, url: "https://example.com/tashkent" },
-        { name: "Фергана", latitude: 40.3842, longitude: 71.7843, inverters: 15, power: 60, url: "https://example.com/fergana" },
-        { name: "Мубарек", latitude: 39.2559, longitude: 65.1529, inverters: 7, power: 25, url: "https://example.com/mubarek" },
-        { name: "Сырдарьинская ТЭС", latitude: 40.8416, longitude: 68.6586, inverters: 11, power: 22, url: "https://example.com/sirdarya" },
-        { name: "Ангрен", latitude: 41.0236, longitude: 70.1431, inverters: 9, power: 35, url: "https://example.com/angren" },
-        { name: "Туракурган", latitude: 40.9983, longitude: 71.5117, inverters: 4, power: 18, url: "https://example.com/turakurgan" }
-        // Добавьте сюда другие области и их координаты
-    ];
+    var oblasts = JSON.parse('{{ plants_json|escapejs }}');
+    console.log(oblasts)
+
+    mapUZB.bubbles(oblasts.map(function (oblast) {
+        return {
+            name: oblast.name,
+            latitude: oblast.latitude,
+            longitude: oblast.longitude,
+            radius: 8, // Радиус круга
+            fillKey: 'UZB',
+            url: '/plant/' + oblast.id,
+            count: oblast.inverter_count,
+            power: oblast.power
+        };
+    }), {
+        // Всплывающая подсказка при наведении (popover) с информацией о количестве инверторов и мощности
+        popupTemplate: function (geo, data) {
+            return '<div class="hoverinfo">' +
+                '<strong>' + data.name + '</strong><br>' +
+                'Мощность: ' + data.power + ' кВт <br>' +
+                'Инверторы: ' + data.count + '<br>' +  // Corrected this line
+                '</div>';
+        }
+    });
+
+    // Сделать метки кликабельными
+    d3.selectAll('.datamaps-bubble').on('click', function (bubble) {
+        window.location.href = bubble.url; // Перенаправление при нажатии на метку
+    });
 
 </script>

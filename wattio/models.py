@@ -20,7 +20,7 @@ class Plant(models.Model):
         verbose_name='Общая мощность (кВт)',
         blank=True,
         null=True
-    )    
+    )
     country = models.CharField(
         max_length=100,
         verbose_name='Страна',
@@ -59,7 +59,12 @@ class Plant(models.Model):
         verbose_name='Изображение станции',
         blank=True,
         null=True,
-        default = 'plants/cover.jpg'
+        default='plants/cover.jpg'
+    )
+    inverter_count = models.IntegerField(
+        verbose_name='Количество инверторов',
+        default=0,
+        validators=[MinValueValidator(0)]
     )
 
     def __str__(self):
