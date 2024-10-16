@@ -98,7 +98,8 @@ class Inverter(models.Model):
         on_delete=models.CASCADE, 
         blank=True, 
         null=True, 
-        verbose_name='Станция'
+        verbose_name='Станция',
+        related_name='inverters'
     )
     color = models.CharField(
         max_length=120, 

@@ -133,34 +133,44 @@ def filter_data(data_list, filter_date):
     
     return filtered_data
 
+import json
+import requests
+from django.db.models import Sum
+from django.shortcuts import render
+from .models import Plant, Inverter
+
 def index(request):
     # Sum of total power from Plant objects
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
     formatted_total_power = round(float(total_power), 2)  # Convert to float if it's a Decimal
-    plants = list(Plant.objects.values('id','name', 'inverter_count', 'latitude', 'longitude', 'power', 'image'))
-    # Convert Decimal values in plants to float
+    
+    
+    plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
+    
     for plant in plants:
-        plant['power'] = float(plant['power'])  # Convert to float for JSON serialization
+        plant['power'] = float(plant['power']) 
     
     plants_json = json.dumps(plants)
 
-    # List of API endpoints for the inverters
     api_urls = [
         "http://10.20.6.30:8080/data/chart/last/all/",
         "http://10.20.96.35:8080/data/chart/last/all/"
     ]
 
-    # Initialize sums for today's generated energy, total generated energy, and current power
     total_today_generate_energy = 0
     total_generate_energy = 0
     total_current_power = 0
+    all_inverter_data = [] 
 
-    # Loop through each API endpoint and sum the values
+    
     for url in api_urls:
         try:
             response = requests.get(url)
-            response.raise_for_status()  # Check if the request was successful
+            response.raise_for_status()  
             data = response.json()
+
+            
+            all_inverter_data.extend(data)  
             
             # Sum values for each inverter in the response
             for inverter in data:
@@ -176,20 +186,25 @@ def index(request):
         except (KeyError, ValueError) as e:
             print(f"Error parsing data from {url}: {e}")
 
+    # Format the totals
     formatted_total_today_energy = round(total_today_generate_energy, 2)
     formatted_total_generate_energy = round(total_generate_energy, 2)
     formatted_total_current_power = round(total_current_power, 2)
 
+    # Context data to pass to the template
     context = {
         'total_power': formatted_total_power,
         'total_today_generate_energy': formatted_total_today_energy,
         'total_generate_energy': formatted_total_generate_energy,
         'total_current_power': formatted_total_current_power,
-        'plants': plants,  
-        'plants_json': plants_json
+        'plants': plants,
+        'plants_json': plants_json,
+        'all_inverter_data': all_inverter_data,  # Add all inverter data to context
+        'inverters': Inverter.objects.all()
     }
 
     return render(request, 'index.html', context)
+
 
 
     

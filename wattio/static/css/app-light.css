@@ -3589,7 +3589,7 @@ input[type="button"].btn-block {
     box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); }
 
 .badge-success {
-  color: #212529;
+  color: #ffffff;
   background-color: #3ad29f; }
   a.badge-success:hover, a.badge-success:focus {
     color: #212529;
@@ -8106,7 +8106,7 @@ svg.navbar-brand-img {
   .table thead th {
     color: #002b70; }
   .table tbody tr th {
-    color: #001a4e; }
+    color: #fff; }
   .table tr.collapse {
     border-top: 1px solid #e9ecef;
     border-bottom: 1px solid #e9ecef; }
