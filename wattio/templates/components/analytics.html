@@ -1,4 +1,13 @@
 {% load static %}
+{% load humanize %}
+<style>
+  /* Custom Tooltip Styles */
+  .tooltip {
+    max-width: none; /* Remove width limit */
+    font-size: 1.2em; /* Increase font size */
+    padding: 10px; /* Add padding */
+  }
+</style>
 <div class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-12">
@@ -21,7 +30,7 @@
                             </div>
                             <div class="col pr-0">
                               <p class="small text-muted mb-0">Проектная мощность</p>
-                              <span class="h3 mb-0">{{total_power}} кВт</span>
+                              <span class="h3 mb-0">{{total_power|floatformat:2|intcomma }} кВт</span>
                             </div>
                           </div>
                         </div>
@@ -33,21 +42,21 @@
                           <div class="row align-items-center">
                             <div class="col-3 text-center">
                               <span class="circle circle-sm">
-                                <img src="{% static 'assets/images/total.png' %}" alt="icon" class="img-fluid"
-                                  style="max-width: 100%; height: auto;">
+                                <img src="{% static 'assets/images/total.png' %}" alt="icon" class="img-fluid" style="max-width: 100%; height: auto;">
                               </span>
                             </div>
                             <div class="col">
                               <p class="small text-muted mb-0">Всего выработано</p>
                               <div class="row align-items-center no-gutters">
                                 <div class="col-auto">
-                                  <span class="h3 mr-2 mb-0">{{ total_generate_energy }} кВт</span>
+                                  <span class="h3 mr-2 mb-0">{{ total_generate_energy|floatformat:0|intcomma }} МВт</span>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                      
                     </div>
                     <div class="col-md-6 mb-4">
                       <div class="card shadow">
@@ -61,7 +70,7 @@
                             </div>
                             <div class="col pr-0">
                               <p class="small text-muted mb-0">Суточная выработка</p>
-                              <span class="h3 mb-0">{{ total_today_generate_energy }} кВт</span>
+                              <span class="h3 mb-0">{{ total_today_generate_energy|floatformat:2|intcomma }} кВт</span>
                             </div>
                           </div>
                         </div>
@@ -79,7 +88,7 @@
                             </div>
                             <div class="col">
                               <p class="small text-muted mb-0">Текущая выработка</p>
-                              <span class="h3 mb-0">{{ total_current_power }} Вт</span>
+                              <span class="h3 mb-0">{{ total_current_power|intcomma }} кВт</span>
                             </div>
                           </div>
                         </div>
@@ -103,24 +112,33 @@
                                             </dl>
                                             <br>
                                             <dl>
-                                                <div class="row">
-                                                    <div class="col-xl-3 text-center mb-3">
-                                                        <p class="mb-1 small text-muted">Проектная мощность</p>
-                                                        <span class="h4">{{ plant.power }} кВт</span><br>
-                                                    </div>
-                                                    <div class="col-3 text-center mb-3">
-                                                        <p class="mb-1 small text-muted">Количество инверторов</p>
-                                                        <span class="h4">{{ plant.inverter_count }}</span><br>
-                                                    </div>
-                                                    <div class="col-3 text-center mb-3">
-                                                        <p class="mb-1 small text-muted">Общая выработка</p>
-                                                        <span class="h4"></span><br>
-                                                    </div>
-                                                    <div class="col-3 text-center mb-3">
-                                                        <p class="mb-1 small text-muted">Текущая выработка</p>
-                                                        <span class="h4"></span><br>
-                                                    </div>
+                                              <div class="row justify-content-center">
+                                                <div class="col-2 text-center mb-3">
+                                                  <p class="mb-1 small text-muted">Количество инверторов</p>
+                                                  <span class="h4">{{ plant.inverter_count }}</span><br>
                                                 </div>
+                                                <div class="col-auto text-center mb-3">
+                                                    <p class="mb-1 small text-muted">Проектная мощность</p>
+                                                    <span class="h4">{{ plant.power }} кВт</span><br>
+                                                </div>
+                                                {% for d in all_data %} 
+                                                    {% if d.location == plant.address and d.serial_number == "All" %} 
+                                                    <div class="col-2 text-center mb-3">
+                                                        <p class="mb-1 small text-muted">Общая выработка</p>
+                                                        <span class="h4">{{d.total_generate_energy |floatformat:0|intcomma}} кВт</span><br>
+                                                    </div>
+                                                    <div class="col-2 text-center mb-3">
+                                                        <p class="mb-1 small text-muted">Суточная выработка</p>
+                                                        <span class="h4">{{d.today_generate_energy |floatformat:0|intcomma}} кВт</span><br>
+                                                    </div>
+                                                    <div class="col-2 text-center mb-3">
+                                                        <p class="mb-1 small text-muted">Текущая выработка</p>
+                                                        <span class="h4">{{d.current_power |floatformat:0|intcomma}} Вт</span><br>
+                                                    </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            
                                             </dl>
                                         </td>
                                         
@@ -141,18 +159,18 @@
                                                         <tbody>
                                                             {% for inverter in inverters %}
                                                             {% if inverter.plant.address|striptags|cut:" " == plant.address|striptags|cut:" " %}
-                                                            {% for d in all_inverter_data %}
+                                                            {% for d in all_data %}  
                                                             {% if d.serial_number == inverter.serial %}
                                                             <tr>
-                                                                <td>{{ inverter.serial }}</td>
-                                                                <td>{{ d.inverter_registers_data.total_generate_energy.data }} кВт</td>
-                                                                <td>{{ d.inverter_registers_data.today_generate_energy.data }} кВт</td>
-                                                                <td>{{ d.inverter_registers_data.current_power.data }} Вт</td>
+                                                                <td>{{ d.serial_number }}</td>
+                                                                <td>{{ d.total_generate_energy }} кВт</td>
+                                                                <td>{{ d.today_generate_energy }} кВт</td>
+                                                                <td>{{ d.current_power }} Вт</td>
                                                                 <td>
-                                                                    <span class="badge badge-{% if d.inverter_registers_data.status.data == "1" or d.inverter_registers_data.status.data == "3"  %}success{% else %}secondary{% endif %}">
-                                                                        {% if d.inverter_registers_data.status.data == "1" %}
+                                                                    <span class="badge badge-{% if d.status.data == "1" or d.status.data == "3"  %}success{% else %}secondary{% endif %}">
+                                                                        {% if d.status.data == "1" %}
                                                                         Online
-                                                                        {% elif d.inverter_registers_data.status.data == "3" %}
+                                                                        {% elif d.status.data == "3" %}
                                                                         Offline
                                                                         {% else %}
                                                                         Unknown
@@ -177,7 +195,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                  <div id="container" style="position: relative; width: 100%; height: 100%;"></div>
+                  <div id="container" style="position: relative; width: 100%; height:100%;"></div>
                 </div>
               </div>
 

@@ -5,10 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var plantLocation = document.getElementById('plant-data').getAttribute('data-location');
         console.log(plantLocation)
 
-        if (plantLocation === 'АО ТЭС') {
+        if (plantLocation === 'JSC_TPP') {
             apiBaseUrl = "http://10.20.6.30:8080";  // TPP API URL
         } else if (plantLocation === 'TASHKENT_TTC') {
             apiBaseUrl = "http://10.20.96.35:8080";  // PTT API URL
+        }
+        else if (plantLocation === 'SIRDARYA_TPP') {
+            apiBaseUrl = "http://10.28.28.50:8080";  // PTT API URL
         } else {
             apiBaseUrl = "http://10.20.6.30:8080";  // Default API URL
         }
