@@ -1173,7 +1173,7 @@ pre {
 .table {
   width: 100%;
   margin-bottom: 1rem;
-  color: #6c757d; }
+  color: #2a3035; }
   .table th,
   .table td {
     padding: 0.75rem;
@@ -1193,7 +1193,7 @@ pre {
   border: 1px solid #e9ecef; }
   .table-bordered th,
   .table-bordered td {
-    border: 1px solid #e9ecef; }
+    border: 2px solid #0188a7; }
   .table-bordered thead th,
   .table-bordered thead td {
     border-bottom-width: 2px; }
@@ -4738,7 +4738,7 @@ button.bg-dark:focus {
   border-right: 1px solid #e9ecef !important; }
 
 .border-bottom {
-  border-bottom: 1px solid #e9ecef !important; }
+  border-bottom: 3px solid #17a2b8 !important; }
 
 .border-left {
   border-left: 1px solid #e9ecef !important; }
@@ -8042,6 +8042,10 @@ h1, h2, h3, h4, h5, h6, strong {
 .text-muted {
   color: #adb5bd !important; }
 
+.text-bold {
+  color: #17a2b8 !important; 
+  font-weight: 700;}
+
 svg.navbar-brand-img {
   fill: #1b68ff; }
 
@@ -8102,7 +8106,8 @@ svg.navbar-brand-img {
 
 /* table */
 .table {
-  color: #6c757d; }
+  color: #076b26;
+  font-weight: 700; }
   .table thead th {
     color: #002b70; }
   .table tbody tr th {
@@ -12058,4 +12063,25 @@ a.uppy-Dashboard-poweredBy {
 
 .card-link:hover .card-title h4 {
   color: #007bff; /* Change the title color on hover */
+}
+
+/* DATAMAPS */
+
+.hoverinfo {
+  font-size: 18px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 3px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 250px;
+}
+
+.nav-item .active {
+  font-weight: bold;
+  color: #007bff; /* You can choose any color */
+}
+
+.nav-item .active i {
+  color: #007bff; /* Icon color for the active link */
 }

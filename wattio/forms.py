@@ -81,22 +81,6 @@ class PlantForm(forms.ModelForm):
             raise forms.ValidationError('Общая мощность должна быть положительным числом.')
         return power
 
-    # def clean_longitude(self):
-    #     longitude = self.cleaned_data.get('longitude')
-    #     if longitude is None:
-    #         raise forms.ValidationError('Долгота обязательна.')
-    #     if longitude < -180 or longitude > 180:
-    #         raise forms.ValidationError('Долгота должна быть в диапазоне от -180 до 180.')
-    #     return longitude
-
-    # def clean_latitude(self):
-    #     latitude = self.cleaned_data.get('latitude')
-    #     if latitude is None:
-    #         raise forms.ValidationError('Широта обязательна.')
-    #     if latitude < -90 or latitude > 90:
-    #         raise forms.ValidationError('Широта должна быть в диапазоне от -90 до 90.')
-    #     return latitude
-
     def clean_image(self):
         image = self.cleaned_data.get('image')
         if image:

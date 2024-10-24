@@ -6,6 +6,8 @@ urlpatterns = [
     path('login/', login, name='login'),
     path('logout/', logout_view, name='logout'),
     
+    path('plant/create/', create_plant, name='create_plant'),
+    path('plant/edit/<int:plant_id>/', edit_plant, name='edit_plant'),
 
     path('test/', test, name='test'),
     path('add-inverter/', inverter_create, name='add_inverter'),

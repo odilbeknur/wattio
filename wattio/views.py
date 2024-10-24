@@ -133,12 +133,6 @@ def filter_data(data_list, filter_date):
     
     return filtered_data
 
-import json
-import requests
-from django.db.models import Sum
-from django.shortcuts import render
-from .models import Plant, Inverter
-
 def index(request):
     # Sum of total power from Plant objects
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
@@ -154,7 +148,8 @@ def index(request):
     api_urls = [
         "http://10.20.6.30:8080/data/chart/last/all/",
         "http://10.20.96.35:8080/data/chart/last/all/",
-        "http://10.28.28.50:8080/data/chart/last/all/"
+        "http://10.28.28.50:8080/data/chart/last/all/",
+        'http://10.20.77.30:8080/data/chart/last/all/'
     ]
 
     
@@ -221,7 +216,7 @@ def index(request):
         'all_data': all_data,
         'inverters': Inverter.objects.all()
     }
-
+    print(Inverter.objects.all())
     return render(request, 'index.html', context)
 
 
@@ -244,6 +239,8 @@ def plant_detail(request, pk):
         api_base_url = 'http://10.20.96.35:8080'
     elif plant.address == "SIRDARYA_TPP":
         api_base_url = 'http://10.28.28.50:8080'
+    elif plant.address == "MUBAREK_TPP":
+        api_base_url = 'http://10.20.77.30:8080'
     else:
         api_base_url = 'http://10.20.6.30:8080'
 
@@ -318,6 +315,8 @@ def inverter_view(request, serial_number):
         api_base_url = 'http://10.20.96.35:8080'
     elif inverter.plant.address == "SIRDARYA_TPP":
         api_base_url = 'http://10.28.28.50:8080'
+    elif inverter.plant.address == "MUBAREK_TPP":
+        api_base_url = 'http://10.20.77.30:8080'
     else:
         api_base_url = 'http://10.20.6.30:8080'
     # Fetch inverters data from API
@@ -365,39 +364,29 @@ def date(request):
 
 
 
+def create_plant(request):
+    if request.method == 'POST':
+        form = PlantForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('plants'))  
+    else:
+        form = PlantForm()
 
-# def index(request):
-#     token = get_access_token(request)
-#     data, redirect_view = get_inverters_data(token)
-#     today_date = datetime.today().strftime('%Y-%m-%d')
+    print(form)
 
-#     if redirect_view:
-#         return redirect(redirect_view)
+    return render(request, 'plant_create.html', {'form': form})
 
-#     # Handle form submission
-#     # if request.method == 'POST':
-#     #     form = InverterForm(request.POST, request.FILES, serial_choices=data['serial_choices'])
-#     #     if form.is_valid():
-#     #         form.save()
-#     #         return redirect('index')
-#     # else:
-#     #     form = InverterForm(serial_choices=data['serial_choices'])
 
-#     if request.method == 'POST':
-#         form = PlantForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('index')  # Replace with your desired redirect URL
-#     else:
-#         form = PlantForm()
-
-#     info = requests.get(f'http://10.20.6.30:8080/data/chart/day/all/{today_date}').json()
-#     context = {
-#         'modal_info': info,
-#         'widgets_serial': Inverter.objects.all(),
-#         'plants': Plant.objects.all(),
-#         'inverters_data': data['inverters_data'],
-#         'form': form
-#     }
-
-#     return render(request, 'index.html', context)
+def edit_plant(request, plant_id):
+    plant = get_object_or_404(Plant, id=plant_id)
+    
+    if request.method == 'POST':
+        form = PlantForm(request.POST, request.FILES, instance=plant)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('plants'))  
+    else:
+        form = PlantForm(instance=plant)
+    
+    return render(request, 'plant_edit.html', {'form': form, 'plant': plant})

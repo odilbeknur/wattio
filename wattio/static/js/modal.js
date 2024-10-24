@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         else if (plantLocation === 'SIRDARYA_TPP') {
             apiBaseUrl = "http://10.28.28.50:8080";  // PTT API URL
-        } else {
+        } else if (plantLocation === 'MUBAREK_TPP') {
+            apiBaseUrl = "http://10.20.77.30:8080";  // PTT API URL
+        }else {
             apiBaseUrl = "http://10.20.6.30:8080";  // Default API URL
         }
         
