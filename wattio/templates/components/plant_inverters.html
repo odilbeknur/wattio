@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="row align-items-center mb-2">
                 <div class="col-5">
-                    <h2 class="h5 page-title">Инверторы</h2>
+                    <h2 class="h5 page-title">Инверторы </h2>
                 </div>
                 <div class="col-7 d-flex align-items-center justify-content-end align-middle">
                     <div class="form-group d-none d-lg-inline mb-0">
@@ -21,12 +21,13 @@
 
 
             <div class="row">
+                <div id="plant-id" data-location="{{ plant.id }}"></div>
                 <div id="plant-data" data-location="{{ plant.address }}"></div>
                 <div id="plant-api" data-location="{{ api_base_url }}"></div>
                 {% for inv in inverters %} 
                 {% if inv.location == plant.address %} 
                 {% for inverter in inverters_data %} 
-                {% if inverter.serial_number == inv.serial_number %} <!-- Only display matching inverter -->
+                {% if inverter.serial_number == inv.serial_number %} 
                 <div class="col-md-3">
                     <div class="card shadow mb-4 clickable-card" id="inverterModal" data-toggle="modal"
                         data-target=".modal-shortcut" data-name="{{ inverter.name }}"

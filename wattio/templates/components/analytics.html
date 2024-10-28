@@ -19,7 +19,8 @@
           <div class="card shadow">
             <div class="card-body">
               <div class="row" style="align-items: center;">
-                <div class="col-md-6 mb-4" style="align-items: center;">
+                
+                <div class="col-md-6">
                   <div class="row ">
                     <div class="col-md-6 mb-4">
                       <div class="card shadow">
@@ -100,17 +101,19 @@
                       </div>
                     </div>
                   </div>
-
+                  <div id="container" style="position: relative; width: 100%; height:100%;"></div>
+                </div>
+                <div class="col-md-6" style="align-items: center;">
                   <!-- table -->
-                  <div class="row mt-4">
-                    <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-12">
                       <div class="card-body">
                         <table class="table table-bordered">
                           <thead>
                             {% for plant in plants %}
                             <tr role="group" data-toggle="collapse" data-target="#demo{{ plant.id }}"
                               class="accordion-toggle bg-white">
-                              <td colspan="10" style="background-color: #17a2b8;">
+                              <td style="background-color: #17a2b8;">
                                 <dl class="row mb-0">
                                   <dt class="col-sm-12 text-center">
                                     <h4 style="color:#fff">{{ plant.name }}</h4>
@@ -123,9 +126,8 @@
                             <tr role="group" data-toggle="collapse" data-target="#demo{{ plant.id }}"
                               class="accordion-toggle bg-white">
                               <td colspan="10">
-                                <dl>
                                   <div class="row justify-content-center">
-                                    <div class="col-2 text-center">
+                                    <div class="col-auto text-center">
                                       <p class="mb-1 small text-bold">Количество инверторов</p>
                                       <span class="h4">{{ plant.inverter_count }}</span><br>
                                     </div>
@@ -135,27 +137,24 @@
                                     </div>
                                     {% for d in all_data %}
                                     {% if d.location == plant.address and d.serial_number == "All" %}
-                                    <div class="col-2 text-center">
+                                    <div class="col-auto text-center">
                                       <p class="mb-1 small text-bold">Общая выработка</p>
                                       <span class="h4">{{d.total_generate_energy |floatformat:1|intcomma}}
                                         кВт</span><br>
                                     </div>
-                                    <div class="col-2 text-center">
+                                    <div class="col-auto text-center">
                                       <p class="mb-1 small text-bold">Суточная выработка</p>
                                       <span class="h4">{{d.today_generate_energy |floatformat:1|intcomma}}
                                         кВт</span><br>
                                     </div>
-                                    <div class="col-2 text-center">
+                                    <div class="col-auto text-center">
                                       <p class="mb-1 small text-bold">Текущая выработка</p>
                                       <span class="h4">{{d.current_power |floatformat:1|intcomma}} Вт</span><br>
                                     </div>
                                     {% endif %}
                                     {% endfor %}
                                   </div>
-
-                                </dl>
                               </td>
-
                             </tr>
                             <tr>
                               <td colspan="10" class="p-0">
@@ -208,11 +207,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div id="container" style="position: relative; width: 100%; height:100%;"></div>
-                </div>
               </div>
-
             </div>
           </div>
         </div>

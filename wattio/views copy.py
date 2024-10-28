@@ -23,6 +23,7 @@ def inverter_create(request):
             exam = form.save()
             exam.save()
             return redirect('index')
+        print(form)
     else:
         form = InverterForm()
         context = {
@@ -32,10 +33,11 @@ def inverter_create(request):
         return render(request, 'index.html', context)
 
  
+# def fetch_data_from_api(url, headers):
 def fetch_data_from_api(url):
     try:
         response = requests.get(url)
-        response.raise_for_status()  
+        response.raise_for_status()  # Raise an error for bad responses
         return response.json(), None
     except requests.RequestException as e:
         print(f"Error fetching data from {url}: {e}")
@@ -43,8 +45,9 @@ def fetch_data_from_api(url):
 
 
 def index(request):
+    # Sum of total power from Plant objects
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
-    formatted_total_power = round(float(total_power), 2)  
+    formatted_total_power = round(float(total_power), 2)  # Convert to float if it's a Decimal
 
     plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
     
@@ -106,6 +109,7 @@ def index(request):
         except ValueError as e:
             print(f"ValueError when processing data from {url}: {e}")  
 
+    print(all_data)            
 
     # Format the totals
     formatted_total_today_energy = round(total_today_generate_energy, 2)
@@ -123,6 +127,7 @@ def index(request):
         'all_data': all_data,
         'inverters': Inverter.objects.all()
     }
+    print(Inverter.objects.all())
     return render(request, 'index.html', context)
 
 def plants_view(request):
@@ -148,6 +153,7 @@ def fetch_inverter_data(api_base_url):
         inverter_response = requests.get(f'{api_base_url}/inverter/')
         inverters = inverter_response.json() if inverter_response.status_code == 200 else []
     except requests.RequestException as e:
+        print(f"Error fetching inverters: {e}")
         return []
 
     inverters_data = []
@@ -161,6 +167,7 @@ def fetch_inverter_data(api_base_url):
                 'data': data.get('inverter_registers_data', {})
             }
         except requests.RequestException as e:
+            print(f"Error fetching data for inverter {serial_number}: {e}")
             inverter_data = {'serial_number': serial_number, 'data': {}}
 
         inverters_data.append(inverter_data)
@@ -168,11 +175,50 @@ def fetch_inverter_data(api_base_url):
     return inverters_data
 
 
+
+
+
+import httpx
+
+
+async def fetch_inverter_data(api_base_url):
+    async with httpx.AsyncClient() as client:
+        inverter_response = await client.get(f'{api_base_url}/inverter/')
+        if inverter_response.status_code == 200:
+            return inverter_response.json()
+        return []
+
+async def fetch_inverter_last_data(api_base_url, serial_number):
+    async with httpx.AsyncClient() as client:
+        data_response = await client.get(f'{api_base_url}/data/last/{serial_number}')
+        if data_response.status_code == 200:
+            return data_response.json()
+        return None
+
+async def fetch_chart_data(api_base_url, selected_date):
+    async with httpx.AsyncClient() as client:
+        chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
+        chart_response = await client.get(chart_api_url)
+        if chart_response.status_code == 200:
+            return chart_response.json()
+        return None
+
+async def fetch_month_data(api_base_url, year, month):
+    async with httpx.AsyncClient() as client:
+        month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
+        month_response = await client.get(month_api_url)
+        if month_response.status_code == 200:
+            return month_response.json()
+        return None
+    
+    
+
 def plant_detail(request, pk):
     plant = get_object_or_404(Plant, pk=pk)
 
     api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
 
+    # Fetch inverters data
     inverter_response = requests.get(f'{api_base_url}/inverter/')
     inverters = inverter_response.json() if inverter_response.status_code == 200 else []
 
@@ -193,44 +239,45 @@ def plant_detail(request, pk):
         try:
             body = json.loads(request.body)
             selected_date = body.get('selected_date')
-            if selected_date:
-                date_parts = selected_date.split('-')
-                if len(date_parts) == 3:  
-                    chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
-                    chart_response = requests.get(chart_api_url)
+            selected_month= body.get('selected_month')
 
-                    if chart_response.status_code == 200:
+            
+            if selected_date and selected_month:
+                date_parts = selected_date.split('-')
+                month_parts = selected_month.split('-')
+                chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
+                
+                chart_response = requests.get(chart_api_url)
+                if chart_response.status_code == 200:
                         chart_data = chart_response.json()
                         response_data = {
                             'status': 'success',
                             'chartData': chart_data
                         }
-                    else:
+                else:
                         response_data = {
                             'status': 'error',
                             'message': 'Failed to fetch daily chart data.'
                         }
-                elif len(date_parts) == 2: 
+ 
+                year, month = month_parts
+                month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
+                chart_response = requests.get(month_api_url)
 
-                    year, month = date_parts
-                    month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
-                    chart_response = requests.get(month_api_url)
-                    if chart_response.status_code == 200:
+                print("Response: ", chart_response)
+
+                if chart_response.status_code == 200:
                         month_data = chart_response.json()
                         response_data = {
                             'status': 'success',
                             'monthData': month_data
                         }
-                    else:
+                else:
                         response_data = {
                             'status': 'error',
                             'message': 'Failed to fetch monthly chart data.'
-                        }
-                else:
-                    response_data = {
-                        'status': 'error',
-                        'message': 'Invalid date format. Please use YYYY-MM-DD or YYYY/MM.'
-                    }
+                        }           
+                    
             else:
                 response_data = {
                     'status': 'error',
@@ -252,8 +299,7 @@ def plant_detail(request, pk):
         'api_base_url': api_base_url,  
     }
     
-    return render(request, 'plant_detail.html', context) 
-
+    return render(request, 'plant_detail.html', context)
 
 def plant_view(request):
     context = {
@@ -323,6 +369,8 @@ def create_plant(request):
             return redirect(reverse('plants'))  
     else:
         form = PlantForm()
+
+    print(form)
 
     return render(request, 'plant_create.html', {'form': form})
 

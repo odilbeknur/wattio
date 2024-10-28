@@ -17,12 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
         onChange: fetchDataAndUpdateChart
     });
 
-    // Event listeners for navigating dates
-    document.getElementById('prev-date').addEventListener('click', () => navigateDate(-1));
-    document.getElementById('next-date').addEventListener('click', () => navigateDate(1));
+    document.getElementById('prev-date').addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateDate(-1);
+    });
+    document.getElementById('next-date').addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateDate(1);
+    });
 
     let columnChart, lineChart;
-    
+
     const columnChartOptions = createColumnChartOptions();
     const lineChartOptions = createLineChartOptions();
 
@@ -60,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const minutes = date.getMinutes();
                 return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
             } } },
-            yaxis: { labels: { show: true, formatter: val => val + " Вт" },   },
+            yaxis: { labels: { show: true, formatter: val => val + " Вт" }, },
             legend: { position: "top", markers: { fillColors: chartColors } },
             grid: { show: true }
         };
@@ -73,81 +78,107 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${year}-${month}-${day}`;
     }
 
+    const plantID = document.getElementById('plant-id').getAttribute('data-location');
+
     async function fetchDataAndUpdateColumnChart() {
         const selectedDate = monthPicker.selectedDates[0];
-        
-        // Format the month to "YYYY/MM"
         const year = selectedDate.getFullYear();
-        const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-        const monthValue = `${year}/${month}`; // Combine year and month in "YYYY/MM" format
-        
-        const apiURL = `${apiBaseURL}/data/chart/month/all/${monthValue}`;
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const monthValue = `${year}-${month}`; 
+        const apiURL = `/plant/${plantID}/`;
+
         try {
-            const response = await fetch(apiURL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const dataList = await response.json();
-    
-            if (dataList.length > 0) {
-                const seriesData = dataList.map((item, index) => ({
-                    name: item.serial_number,
-                    data: item.data_list.map(dataItem => {
-                        let date = new Date(dataItem.create_date);
-                        return { x: date.getTime(), y: dataItem.data };
-                    }),
-                    color: chartColors[index % chartColors.length]
-                }));
-    
-                const columnChartContainer = document.querySelector("#columnChartM");
-                if (columnChartContainer) {
-                    if (columnChart) columnChart.destroy(); // Destroy the previous instance
-                    columnChart = new ApexCharts(columnChartContainer, { ...columnChartOptions, series: seriesData });
-                    await columnChart.render(); // Ensure the chart is rendered after initialization
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            $.ajax({
+                url: apiURL,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ 'selected_date': monthValue }),
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                success: function(responseData) {
+                    console.log('Django response:', responseData);
+
+                    // Check if the response is successful
+                    if (responseData.status === 'success' && responseData.monthData) {
+                        const seriesData = responseData.monthData.map((item, index) => ({
+                            name: item.serial_number,
+                            data: item.data_list.map(dataItem => {
+                                let date = new Date(dataItem.create_date);
+                                return { x: date.getTime(), y: dataItem.data };
+                            }),
+                            color: chartColors[index % chartColors.length]
+                        }));
+
+                        const columnChartContainer = document.querySelector("#columnChartM");
+                        if (columnChartContainer) {
+                            if (columnChart) columnChart.destroy(); // Destroy the previous instance
+                            columnChart = new ApexCharts(columnChartContainer, { ...columnChartOptions, series: seriesData });
+                            columnChart.render(); // Render the chart
+                        }
+                    } else {
+                        console.warn('No data available for the selected month or invalid response.');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error fetching or parsing data:', error);
                 }
-            } else {
-                console.warn('No data available for the selected month.');
-            }
+            });
         } catch (error) {
-            console.error('Error fetching or parsing data:', error);
+            console.error('Error:', error);
         }
     }
-    
 
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(datePicker.selectedDates[0]);
+        const apiURL = `/plant/${plantID}/`; 
+        console.log("URL for Django", apiURL);
 
-        console.log(dateValue)
         if (dateValue) {
-            const apiURL = `${apiBaseURL}/data/chart/day/all/${dateValue}`;
-            console.log(apiURL)
-
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             try {
-                const response = await fetch(apiURL);
-                const dataList = await response.json();
-                console.log(dataList)
-                if (dataList.length > 0) {
-                    const seriesData = dataList.map((item, index) => ({
-                        name: item.serial_number,
-                        data: item.data_list.map(dataItem => {
-                            let date = new Date(dataItem.create_date);
-                            date.setHours(date.getHours() + 5); // Add 5 hours to the date
-                            return { x: date.getTime(), y: dataItem.data };
-                        }),
-                        color: chartColors[index % chartColors.length]
-                    }));
-                    const lineChartContainer = document.querySelector("#lineChart");
-                    if (lineChartContainer) {
-                        if (lineChart) lineChart.destroy(); // Destroy the previous instance
-                        lineChart = new ApexCharts(lineChartContainer, { ...lineChartOptions, series: seriesData });
-                        lineChart.render();
+                // Sending the selected date to the Django backend using AJAX
+                $.ajax({
+                    url: apiURL,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'selected_date': dateValue }),
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    success: function(responseData) {
+                        console.log('Django response:', responseData);
+        
+                        // Check if the response is successful
+                        if (responseData.status === 'success' && responseData.chartData) {
+                            const seriesData = responseData.chartData.map((item, index) => ({
+                                name: item.serial_number,
+                                data: item.data_list.map(dataItem => {
+                                    let date = new Date(dataItem.create_date);
+                                    date.setHours(date.getHours() + 5); // Adjust the timezone if necessary
+                                    return { x: date.getTime(), y: dataItem.data };
+                                }),
+                                color: chartColors[index % chartColors.length]
+                            }));
+        
+                            const lineChartContainer = document.querySelector("#lineChart");
+                            if (lineChartContainer) {
+                                if (lineChart) lineChart.destroy(); // Destroy the previous instance
+                                lineChart = new ApexCharts(lineChartContainer, { ...lineChartOptions, series: seriesData });
+                                lineChart.render(); // Render the chart
+                            }
+                        } else {
+                            console.error('No data available for the selected date or invalid response.');
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error fetching or parsing data:', error);
                     }
-                } else {
-                    console.error('No data available for the selected date.');
-                }
+                });
             } catch (error) {
-                console.error('Error fetching or parsing data:', error);
+                console.error('Error:', error);
             }
         }
     }
