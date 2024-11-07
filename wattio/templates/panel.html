@@ -1,0 +1,26 @@
+{% extends 'panel_base.html' %}
+{% load static %}
+
+{% block heads%}
+<link rel="stylesheet" href="{% static 'css/flatpickr.min.css' %}">
+{% endblock%}
+{% block main %}
+  {% include 'components/dashboard.html' %}
+
+{% endblock main %}   
+
+{% block scripts %}
+<script>
+  setInterval(function() {
+            window.location.reload();
+        }, 5 * 60 * 1000);
+</script>
+<script src="{% static 'js/d3.min.js' %}"></script>
+<script src="{% static 'js/topojson.min.js' %}"></script>
+<script src="{% static 'js/datamaps.uzb.js' %}"></script>
+<script>
+  var oblasts = JSON.parse('{{ plants_json|escapejs }}');
+</script>
+<script src="{% static 'js/datamaps.custom.js' %}"></script> 
+
+{% endblock %}

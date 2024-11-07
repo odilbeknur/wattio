@@ -37,4 +37,10 @@ var base = {
     dark = document.querySelector("#darkTheme"),
     light = document.querySelector("#lightTheme"),
     switcher = document.querySelector("#modeSwitcher");
-// console.log(curentTheme), curentTheme ? ("dark" == curentTheme ? (dark.disabled = !1, light.disabled = !0, colors = darkColor) : "light" == curentTheme && (dark.disabled = !0, light.disabled = !1), switcher.dataset.mode = curentTheme) : $("body").hasClass("dark") ? (colors = darkColor, localStorage.setItem("mode", "dark")) : localStorage.setItem("mode", "light");
+
+function modeSwitch() {
+    console.log("abc");
+    var o = localStorage.getItem("mode");
+    o ? "dark" == o ? (dark.disabled = !0, light.disabled = !1, localStorage.setItem("mode", "light")) : (dark.disabled = !1, light.disabled = !0, localStorage.setItem("mode", "dark")) : $("body").hasClass("dark") ? (dark.disabled = !1, light.disabled = !0, localStorage.setItem("mode", "dark")) : (dark.disabled = !0, light.disabled = !1, localStorage.setItem("mode", "light"))
+}
+console.log(curentTheme), curentTheme ? ("dark" == curentTheme ? (dark.disabled = !1, light.disabled = !0, colors = darkColor) : "light" == curentTheme && (dark.disabled = !0, light.disabled = !1), switcher.dataset.mode = curentTheme) : $("body").hasClass("dark") ? (colors = darkColor, localStorage.setItem("mode", "dark")) : localStorage.setItem("mode", "light");

@@ -131,15 +131,14 @@ def plants_view(request):
     }
     return render(request, 'plants.html', context)
 
-from django.http import JsonResponse
-import json
 
 # Define a mapping of plant addresses to API URLs
 API_URLS = {
     "JSC_TPP": 'http://10.20.6.30:8080',
     "TASHKENT_TTC": 'http://10.20.96.35:8080',
     "SIRDARYA_TPP": 'http://10.28.28.50:8080',
-    "MUBAREK_TPP": 'http://10.20.77.30:8080'
+    "MUBAREK_TPP": 'http://10.20.77.30:8080',
+    "TALIMARJAN_TPP": 'http://10.20.6.60:8080/'
 }
 
 def fetch_inverter_data(api_base_url):
@@ -275,8 +274,10 @@ def inverter_view(request, serial_number):
         api_base_url = 'http://10.28.28.50:8080'
     elif inverter.plant.address == "MUBAREK_TPP":
         api_base_url = 'http://10.20.77.30:8080'
+    elif inverter.plant.address == "TALIMARJAN_TPP":
+        api_base_url = 'http://10.20.6.60:8080/'
     else:
-        api_base_url = 'http://10.20.6.30:8080'
+        api_base_url = 'http://10.20.6.30:8080/'
     # Fetch inverters data from API
     inverters, redirect_view = fetch_data_from_api(f'{api_base_url}/inverter/')
     if redirect_view:
@@ -339,3 +340,94 @@ def edit_plant(request, plant_id):
         form = PlantForm(instance=plant)
     
     return render(request, 'plant_edit.html', {'form': form, 'plant': plant})
+
+
+
+def panel_view(request):
+    total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
+    formatted_total_power = round(float(total_power), 2)  
+
+    plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
+    
+    for plant in plants:
+        plant['power'] = float(plant['power']) 
+    
+    plants_json = json.dumps(plants)
+
+    api_urls = [
+        "http://10.20.6.30:8080/data/chart/last/all/",
+        "http://10.20.96.35:8080/data/chart/last/all/",
+        "http://10.28.28.50:8080/data/chart/last/all/",
+        'http://10.20.77.30:8080/data/chart/last/all/'
+    ]
+
+    
+    total_today_generate_energy = 0
+    total_generate_energy = 0
+    total_current_power = 0
+    all_data = []
+
+    for url in api_urls:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise exception for HTTP errors
+            data = response.json()
+
+            # Combine processing for summing and storing location data
+            for location, inverters in data.items():
+                for inverter in inverters:
+                        registers_data = inverter.get("inverter_registers_data", {})
+                        current_power = float(registers_data["current_power"]["data"])
+                        today_energy = float(registers_data["today_generate_energy"]["data"])
+                        total_energy = float(registers_data["total_generate_energy"]["data"])
+                        serial_number = inverter['serial_number']
+                        status = ''
+                        if inverter['serial_number'] != "All":
+                            status = registers_data['status']
+                            # Accumulate totals
+                            total_current_power += current_power
+                            total_today_generate_energy += today_energy
+                            total_generate_energy += total_energy
+                        
+                        # Store location and inverter data
+                        all_data.append({
+                            "location": location,
+                            'serial_number' : serial_number,
+                            "current_power": current_power,
+                            "today_generate_energy": today_energy,
+                            "total_generate_energy": total_energy,
+                            "status": status,
+                        })
+
+            print("Processed data from:", url)
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from {url}: {e}")
+        except KeyError as e:
+            print(f"KeyError when parsing data from {url}: {e}")
+        except ValueError as e:
+            print(f"ValueError when processing data from {url}: {e}")  
+
+
+    # Format the totals
+    formatted_total_today_energy = round(total_today_generate_energy, 2)
+    formatted_total_generate_energy = round(total_generate_energy, 2)
+    formatted_total_current_power = round(total_current_power/1000, 2)
+
+    # Context data to pass to the template
+    context = {
+        'total_power': formatted_total_power,
+        'total_today_generate_energy': formatted_total_today_energy,
+        'total_generate_energy': formatted_total_generate_energy / 1000,
+        'total_current_power': formatted_total_current_power,
+        'plants': plants,
+        'plants_json': plants_json,
+        'all_data': all_data,
+        'inverters': Inverter.objects.all()
+    }
+    return render(request, 'panel.html', context)
+
+def plants_view(request):
+    context = {
+        'plants': Plant.objects.all(),
+    }
+    return render(request, 'plants.html', context)

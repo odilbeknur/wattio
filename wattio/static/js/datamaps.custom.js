@@ -16,7 +16,6 @@ var regionNameMapping = {
     "Nukus": "Нукус",
     "Karakalpakstan": "Каракалпакстан",
     "Andijon": "Андижан",
-    "Kashkadarya": "Кашкадарья",
     "Bukhara": "Бухара"
 };
 
@@ -24,25 +23,23 @@ var mapUZB, mapUZBox = document.getElementById("container");
 mapUZBox && (mapUZB = new Datamap({
     element: document.getElementById('container'),
     scope: 'uzb',
-    responsive: !0,
+    responsive: true,
     aspectRatio: .45,
     setProjection: function (element) {
-        // Get the width and height of the container element
         var width = element.offsetWidth;
         var height = element.offsetHeight;
 
-        var scale = Math.min(width, height)*4;
+        var scale = Math.min(width, height) * 5;
 
-        var centerLongitude = 60; // Longitude of Uzbekistan
-        var centerLatitude = 39; // Latitude of Uzbekistan
-        var adaptiveLongitude = centerLongitude + (width - height) / width * 5; // Adjust for width
-        var adaptiveLatitude = centerLatitude - (height - width) / height * 2; // Adjust for height
+        var centerLongitude = 60;
+        var centerLatitude = 39;
+        var adaptiveLongitude = centerLongitude + (width - height) / width * 5;
+        var adaptiveLatitude = centerLatitude - (height - width) / height * 2;
 
-        // Define the projection with the adaptive center
         var projection = d3.geo.mercator()
-            .center([adaptiveLongitude, adaptiveLatitude])  // Adaptive center
-            .scale(scale)                                   // Dynamic scale based on element size
-            .translate([width / 2, height / 2]);             // Center the map in the container
+            .center([adaptiveLongitude, adaptiveLatitude])
+            .scale(scale)
+            .translate([width / 2, height / 2]);
 
         var path = d3.geo.path().projection(projection);
 
@@ -50,14 +47,17 @@ mapUZBox && (mapUZB = new Datamap({
     },
 
     fills: {
-        defaultFill: "#ffff", // Цвет по умолчанию
-        'UZB': '#0f75fa',    
-        'Tashkent': '#0f75fa',
+        defaultFill: "#f4f4f4",  // default region color
+        'UZB': '#0f75fa',        // Uzbekistan's color
+        'Tashkent': '#FF5733',    // Tashkent color
+        'Samarkand': '#33FF57',   // Samarkand color
+        'Bukhoro': '#3357FF',     // Bukhoro color
     },
     data: {
-    Tashkent: {
-        fillKey: 'TASHKENT'
-    }
+        Tashkent: { fillKey: 'Tashkent' },
+        Samarkand: { fillKey: 'Samarkand' },
+        Bukhoro: { fillKey: 'Bukhoro' },
+        // Add more regions with their fillKey as needed
     },
     geographyConfig: {
         highlightOnHover: true,
@@ -66,41 +66,36 @@ mapUZBox && (mapUZB = new Datamap({
         borderWidth: 1,
         highlightFillColor: '#17a2b8',
         highlightBorderColor: 'rgba(34,117,215,.25)',
-        // Use the mapping in the popupTemplate
         popupTemplate: function (geo, data) {
-            // Get the correct Russian name from the mapping
-            const regionName = regionNameMapping[geo.properties.name] || geo.properties.name; // Default to original name if not found
+            const regionName = regionNameMapping[geo.properties.name] || geo.properties.name;
             return '<div class="hoverinfo">' + regionName + '</div>';
         }
     }
 }), window.addEventListener("resize", function () {
-    mapUZB.resize()
+    mapUZB.resize();
 }));
-
 
 mapUZB.bubbles(oblasts.map(function (oblast) {
     return {
         name: oblast.name,
         latitude: oblast.latitude,
         longitude: oblast.longitude,
-        radius: 8, // Радиус круга
+        radius: 8,
         fillKey: 'UZB',
         url: '/plant/' + oblast.id,
         count: oblast.inverter_count,
         power: oblast.power
     };
 }), {
-    // Всплывающая подсказка при наведении (popover) с информацией о количестве инверторов и мощности
     popupTemplate: function (geo, data) {
         return '<div class="hoverinfo">' +
             '<strong>' + data.name + '</strong><br>' +
             'Мощность: ' + data.power + ' кВт <br>' +
-            'Инверторы: ' + data.count + '<br>' +  // Corrected this line
+            'Инверторы: ' + data.count + '<br>' +
             '</div>';
     }
 });
 
-// Сделать метки кликабельными
 d3.selectAll('.datamaps-bubble').on('click', function (bubble) {
-    window.location.href = bubble.url; // Перенаправление при нажатии на метку
+    window.location.href = bubble.url;
 });
