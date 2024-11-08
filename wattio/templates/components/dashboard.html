@@ -111,43 +111,44 @@
                   <div id="container" class="chart-container"></div>
                 </div>
               </div>
-              <div class="row">
-                <div class="container-fluid">
-                  <div class="row justify-content-center">
-                    <div class="col-12">
-                      <div class="row align-items-center my-4">
-                        <!-- <div class="col-auto">
-                          <button type="button" class="btn btn-primary"><span class="fe fe-plus fe-12 mr-2"></span>Добавить</button>
-                        </div> -->
-                      </div>
-                      <div class="row">
-                        {% for plant in plants_grid%}
-                        <div class="col-md-2">
-                          <a href="{% url 'panel_detail' plant.id %}" class="text-decoration-none card-link">
-                              
-                            <div class="card shadow mb-4 hover-card">
-                              <!-- Card Header for Cover Image -->
-                              <div class="card-header p-0">
-                                <img src="{{ plant.image.url }}" alt="" class="img-fluid rounded-top"> 
+              <div class="container-fluid">
+                <div class="row justify-content-center">
+                  <div class="col-12">
+                    <div class="row align-items-center my-4">
+                      <!-- Optionally add controls here -->
+                    </div>
+                    <div class="row justify-content-center">
+                      {% for plant in plants_grid %}
+                      <div class="col-md-2 col-sm-4 col-6 mb-4 d-flex justify-content-center">
+                        <a href="{% url 'panel_detail' plant.id %}" class="text-decoration-none card-link">
+                          <div class="card shadow hover-card">
+                            <!-- Card Header for Cover Image -->
+                            <div class="card-header p-0">
+                              <img src="{{ plant.image.url }}" alt="" class="img-fluid rounded-top">
+                            </div>
+                            <div class="card-body text-center">
+                              <div class="card-text my-2">
+                                <strong class="card-title my-0">
+                                  <h4>{{ plant.name }}</h4>
+                                </strong>
+                                <p class="small text-muted mb-0">
+                                  <span class="badge badge-info">{{ plant.power }} кВт</span>
+                                </p>
+                                <p class="small">
+                                  <span class="badge badge-light text-muted">{{ plant.city }}</span>
+                                </p>
                               </div>
-                              <div class="card-body text-center"> 
-                                <div class="card-text my-2">
-                                  <strong class="card-title my-0"><h4>{{ plant.name }}</h4></strong>
-                                  <p class="small text-muted mb-0"><span class="badge badge-info">{{ plant.power }} кВт</span></p>
-                                  <p class="small">
-                                    <span class="badge badge-light text-muted">{{ plant.city }}</span>
-                                  </p>
-                                </div>
-                              </div> <!-- ./card-body -->
-                            </div> <!-- ./card -->
-                          </a>
-                        </div> <!-- .col -->
-                        {% endfor %}
-                      </div> <!-- .row -->
-                    </div> <!-- .col-12 -->
-                  </div> <!-- .row -->
-                </div>
-              </div>
+                            </div> <!-- ./card-body -->
+                          </div> <!-- ./card -->
+                        </a>
+                      </div>
+                      {% endfor %}
+                    </div> <!-- .row -->
+                  </div> <!-- .col-12 -->
+                </div> <!-- .row -->
+              </div> <!-- .container-fluid -->
+              
+             
               <div class="row"style="align-items: center;">
                 <div class="col-md-12" style="align-items: center;">
                   <!-- table -->
