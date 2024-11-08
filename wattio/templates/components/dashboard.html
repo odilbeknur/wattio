@@ -11,98 +11,145 @@
     /* Add padding */
   }
 </style>
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-10">
   <div class="row justify-content-center">
     <div class="col-12">
       <div class="row align-items-ceneter mb-2">
         <div class="col-md-12 mb-4">
           <div class="card shadow">
             <div class="card-body">
-              <div class="row" style="align-items: center;">
-                <div class="col-md-5">
-                  <div class="row ">
-                    <div class="col-md-6 mb-4">
-                      <div class="card shadow">
-                        <div class="card-body">
-                          <div class="row align-items-center">
-                            <div class="col-3 text-center">
-                              <span class="circle circle-sm">
-                                <img src="{% static 'assets/images/factory.png' %}" alt="icon" class="img-fluid"
-                                  style="max-width: 100%; height: auto;">
-                              </span>
-                            </div>
-                            <div class="col pr-0">
-                              <p class="small text-bold mb-0">Проектная мощность</p>
-                              <span class="h3 mb-0">{{total_power|floatformat:2|intcomma }} кВт</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                      <div class="card shadow">
-                        <div class="card-body">
-                          <div class="row align-items-center">
-                            <div class="col-3 text-center">
-                              <span class="circle circle-sm">
-                                <img src="{% static 'assets/images/total.png' %}" alt="icon" class="img-fluid"
-                                  style="max-width: 100%; height: auto;">
-                              </span>
-                            </div>
-                            <div class="col">
-                              <p class="small text-bold mb-0">Выработано (за все время)</p>
-                              <div class="row align-items-center no-gutters">
-                                <div class="col-auto">
-                                  <span class="h3 mr-2 mb-0">{{ total_generate_energy|floatformat:2|intcomma }}
-                                    МВт</span>
+              <div class="row align-items-center">
+                <div class="col-md-6"> 
+                  <div class="container">
+                    <div class="row ">
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card l-bg-cherry">
+                                <div class="card-statistic-3 p-4">
+                                    <div class="card-icon card-icon-large"><i class="fas fa-shopping-cart"></i></div>
+                                    <div class="mb-4">
+                                        <h5 class="card-title mb-0" style = "color:#fff ">Проектная мощность</h5>
+                                    </div>
+                                    <div class="row align-items-center mb-2 d-flex">
+                                        <div class="col-8">
+                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                              {{ total_power|floatformat:2|intcomma }} кВт
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                                        <div class="progress-bar l-bg-cyan" role="progressbar" data-width="100%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
                         </div>
-                      </div>
-
-                    </div>
-                    <div class="col-md-6 mb-4">
-                      <div class="card shadow">
-                        <div class="card-body">
-                          <div class="row align-items-center">
-                            <div class="col-3 text-center">
-                              <span class="circle circle-sm">
-                                <img src="{% static 'assets/images/day.png' %}" alt="icon" class="img-fluid"
-                                  style="max-width: 100%; height: auto;">
-                              </span>
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card l-bg-blue-dark">
+                                <div class="card-statistic-3 p-4">
+                                    <div class="card-icon card-icon-large"><i class="fas fa-users"></i></div>
+                                    <div class="mb-4">
+                                        <h5 class="card-title mb-0" style = "color:#fff ">Выработано (за все время)</h5>
+                                    </div>
+                                    <div class="row align-items-center mb-2 d-flex">
+                                        <div class="col-8">
+                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                              {{ total_generate_energy|floatformat:2|intcomma }} МВт
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                                        <div class="progress-bar l-bg-green" role="progressbar" data-width="25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col pr-0">
-                              <p class="small text-bold mb-0">Выработано (сегодня)</p>
-                              <span class="h3 mb-0">{{ total_today_generate_energy|floatformat:2|intcomma }} кВт</span>
-                            </div>
-                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                      <div class="card shadow">
-                        <div class="card-body">
-                          <div class="row align-items-center">
-                            <div class="col-3 text-center">
-                              <span class="circle circle-sm">
-                                <img src="{% static 'assets/images/current.png' %}" alt="icon" class="img-fluid"
-                                  style="max-width: 100%; height: auto;">
-                              </span>
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card l-bg-green-dark">
+                                <div class="card-statistic-3 p-4">
+                                    <div class="card-icon card-icon-large"><i class="fas fa-ticket-alt"></i></div>
+                                    <div class="mb-4">
+                                        <h5 class="card-title mb-0" style = "color:#fff ">Выработано (сегодня)</h5>
+                                    </div>
+                                    <div class="row align-items-center mb-2 d-flex">
+                                        <div class="col-8">
+                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                              {{ total_today_generate_energy|floatformat:2|intcomma }} кВт
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                                        <div class="progress-bar l-bg-orange" role="progressbar" data-width="100%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 35%;"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col">
-                              <p class="small text-bold mb-0">Текущая выработка</p>
-                              <span class="h3 mb-0">{{ total_current_power|intcomma }} кВт</span>
-                            </div>
-                          </div>
                         </div>
-                      </div>
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card l-bg-orange-dark">
+                                <div class="card-statistic-3 p-4">
+                                    <div class="card-icon card-icon-large"><i class="fas fa-dollar-sign"></i></div>
+                                    <div class="mb-4">
+                                        <h5 class="card-title mb-0" style = "color:#fff ">Текущая выработка</h5>
+                                    </div>
+                                    <div class="row align-items-center mb-2 d-flex">
+                                        <div class="col-8">
+                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                              {{ total_current_power|intcomma }} кВт
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                                        <div class="progress-bar l-bg-cyan" role="progressbar" data-width="65%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 65%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                   </div>
-                  <div id="container" style="position: relative; width: 100%; height:100%;"></div>
+
                 </div>
-                <div class="col-md-7" style="align-items: center;">
+                <!-- Right Column -->
+                <div class="col-md-6 mb-4">
+                  <div id="container" class="chart-container"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="container-fluid">
+                  <div class="row justify-content-center">
+                    <div class="col-12">
+                      <div class="row align-items-center my-4">
+                        <!-- <div class="col-auto">
+                          <button type="button" class="btn btn-primary"><span class="fe fe-plus fe-12 mr-2"></span>Добавить</button>
+                        </div> -->
+                      </div>
+                      <div class="row">
+                        {% for plant in plants_grid%}
+                        <div class="col-md-2">
+                          <a href="{% url 'panel_detail' plant.id %}" class="text-decoration-none card-link">
+                              
+                            <div class="card shadow mb-4 hover-card">
+                              <!-- Card Header for Cover Image -->
+                              <div class="card-header p-0">
+                                <img src="{{ plant.image.url }}" alt="" class="img-fluid rounded-top"> 
+                              </div>
+                              <div class="card-body text-center"> 
+                                <div class="card-text my-2">
+                                  <strong class="card-title my-0"><h4>{{ plant.name }}</h4></strong>
+                                  <p class="small text-muted mb-0"><span class="badge badge-info">{{ plant.power }} кВт</span></p>
+                                  <p class="small">
+                                    <span class="badge badge-light text-muted">{{ plant.city }}</span>
+                                  </p>
+                                </div>
+                              </div> <!-- ./card-body -->
+                            </div> <!-- ./card -->
+                          </a>
+                        </div> <!-- .col -->
+                        {% endfor %}
+                      </div> <!-- .row -->
+                    </div> <!-- .col-12 -->
+                  </div> <!-- .row -->
+                </div>
+              </div>
+              <div class="row"style="align-items: center;">
+                <div class="col-md-12" style="align-items: center;">
                   <!-- table -->
                   <div class="row">
                     <div class="col-12">
@@ -212,6 +259,5 @@
         </div>
       </div> <!-- .row -->
     </div>
-
   </div>
 </div>

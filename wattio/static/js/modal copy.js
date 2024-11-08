@@ -2,12 +2,27 @@ document.addEventListener('DOMContentLoaded', function () {
     $('.modal-shortcut').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var serial = button.data('serial');
+        var plantLocation = document.getElementById('plant-data').getAttribute('data-location');
+        console.log(plantLocation)
 
+        if (plantLocation === 'JSC_TPP') {
+            apiBaseUrl = "http://10.20.6.30:8080";  // TPP API URL
+        } else if (plantLocation === 'TASHKENT_TTC') {
+            apiBaseUrl = "http://10.20.96.35:8080";  // PTT API URL
+        }
+        else if (plantLocation === 'SIRDARYA_TPP') {
+            apiBaseUrl = "http://10.28.28.50:8080";  // PTT API URL
+        } else if (plantLocation === 'MUBAREK_TPP') {
+            apiBaseUrl = "http://10.20.77.30:8080";  // PTT API URL
+        }else {
+            apiBaseUrl = "http://10.20.6.30:8080";  // Default API URL
+        }
+        
         // Construct the URL dynamically
-        var baseUrl = "http://10.20.6.30:8080/data/chart/day/{serial_number}/yyyy-mm-dd"; 
+        var baseUrl = `${apiBaseUrl}/data/chart/day/{serial_number}/yyyy-mm-dd`; 
+        console.log(baseUrl)
         var todayDate = new Date().toISOString().split('T')[0]; // Get today's date in yyyy-mm-dd format
         var detailUrl = baseUrl.replace('{serial_number}', serial).replace('yyyy-mm-dd', todayDate); // Replace placeholders with actual values
-
         // Fetch data from the API
         fetch(detailUrl)
             .then(response => response.json())
@@ -22,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 modal.find('#modalTemperature').text(button.data('temperature') + ' ℃');
                 modal.find('#modalCurrentPower').text(button.data('current-power') + ' Вт');
                 modal.find('#modalTotalEnergy').text(button.data('total-energy') + ' кВт·ч');
-                modal.find('#modalWorkTime').text(button.data('work-time') + ' ч');
 
                 // Set status text based on status value
                 var statusText = '';

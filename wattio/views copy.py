@@ -174,45 +174,6 @@ def fetch_inverter_data(api_base_url):
 
     return inverters_data
 
-
-
-
-
-import httpx
-
-
-async def fetch_inverter_data(api_base_url):
-    async with httpx.AsyncClient() as client:
-        inverter_response = await client.get(f'{api_base_url}/inverter/')
-        if inverter_response.status_code == 200:
-            return inverter_response.json()
-        return []
-
-async def fetch_inverter_last_data(api_base_url, serial_number):
-    async with httpx.AsyncClient() as client:
-        data_response = await client.get(f'{api_base_url}/data/last/{serial_number}')
-        if data_response.status_code == 200:
-            return data_response.json()
-        return None
-
-async def fetch_chart_data(api_base_url, selected_date):
-    async with httpx.AsyncClient() as client:
-        chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
-        chart_response = await client.get(chart_api_url)
-        if chart_response.status_code == 200:
-            return chart_response.json()
-        return None
-
-async def fetch_month_data(api_base_url, year, month):
-    async with httpx.AsyncClient() as client:
-        month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
-        month_response = await client.get(month_api_url)
-        if month_response.status_code == 200:
-            return month_response.json()
-        return None
-    
-    
-
 def plant_detail(request, pk):
     plant = get_object_or_404(Plant, pk=pk)
 

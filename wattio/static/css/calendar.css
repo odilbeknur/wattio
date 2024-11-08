@@ -60,13 +60,3 @@
 .clickable-card:hover .card-body {
     background-color: #f8f9fa;
 }
-
-
-/* Main logo */
-#logo {
-    max-width: 40px;
-}
-
-#logo-text {
-    font-family:"Overpass", sans-serif;
-}

@@ -1,44 +1,53 @@
 {% load static %}
 
 <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
-    <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
-        <i class="fe fe-x"><span class="sr-only"></span></i>
-    </a>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white flex-row shadow">
-        <div class="container-fluid text-center">
-          <button class="navbar-toggler mt-2 mr-auto toggle-sidebar text-muted">
-            <i class="fe fe-menu navbar-toggler-icon"></i>
-          </button>
-          <div class="navbar-slide bg-white ml-lg-4" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item dropdown">
-                <a class="navbar-brand mx-lg-1 mr-0" href="./index.html">
-                    <img src="{% static 'assets/images/logo.png' %}" id="logo" alt="">
-                  </a>
-              </li>
-              <li class="nav-item dropdown">
-                <a href="{% url 'panel' %}" class="nav-link" role="button" aria-haspopup="true" aria-expanded="false">
-                  <span class="ml-lg-2">Дашборд</span><span class="sr-only">(current)</span>
-                </a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="dropdown-toggle nav-link pl-lg-3" href="#" id="plantsDropdown" role="button" data-toggle="collapse" aria-haspopup="true" aria-expanded="false">Станции </a>
-                <ul class="dropdown-menu" aria-labelledby="plantsDropdown">
-                  <a class="nav-link pl-lg-2" href="./chart-inline.html"><span class="ml-1">Inline Chart</span></a>
-                  <a class="nav-link pl-lg-2" href="./chart-chartjs.html"><span class="ml-1">Chartjs</span></a>
-                  <a class="nav-link pl-lg-2" href="./chart-apexcharts.html"><span class="ml-1">ApexCharts</span></a>
-                  <a class="nav-link pl-lg-2" href="./datamaps.html"><span class="ml-1">Datamaps</span></a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow">
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+            <!-- Navigation Links -->
+            <div class="navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center">
+                    <!-- Logo -->
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="navbar-brand d-flex align-items-center" href="{% url 'panel' %}">
+                            <img src="{% static 'assets/images/logo.png' %}" id="logo" alt="Logo" style="height: auto; width: 70px; ">
+                            &nbsp; &nbsp;  &nbsp;</i> <strong><span class="navbar-title" style="text-transform: uppercase; color:rgb(14, 64, 129);">
+                                Энергия, выработанная солнечными электростанциями АО «Тепловые электростанции».</span></strong>
+                        </a>
+                    </li>
                 </ul>
-              </li>
-            </ul>
-          </div>
-          <ul class="navbar-nav d-flex flex-row">
-            <li class="nav-item">
-              <a class="nav-link text-muted my-2" href="./#" id="modeSwitcher" data-mode="light">
-                <i class="fe fe-sun fe-16"></i>
-              </a>
-            </li>
-          </ul>
+            </div>
+
+            <!-- <ul class="navbar-nav d-flex align-items-center">
+          <li class="nav-item">
+            <a class="nav-link text-m   uted" href="./#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+        </ul> -->
         </div>
-      </nav>
+    </nav>
 </aside>
+<style>
+    /* Container adjustments */
+.navbar-nav {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  justify-content: center; /* Center items horizontally */
+  flex-wrap: wrap; /* Allow text to wrap */
+  gap: 10px; /* Add spacing between elements */
+}
+
+/* Text container */
+.navbar-title {
+  text-transform: uppercase;
+  color: rgb(14, 64, 129);
+  font-size: 20px;
+  line-height: 1.4;
+  white-space: normal; /* Allow wrapping */
+  text-align: center; /* Center text horizontally */
+  overflow: visible; /* Prevent clipping */
+  max-width: 100%; /* Ensure it doesn't exceed the container width */
+}
+
+
+</style>

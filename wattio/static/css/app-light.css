@@ -1058,6 +1058,11 @@ pre {
     flex: 0 0 32%;
     max-width: 32%;
   }
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
 }
 
   .col-xl {
@@ -8116,7 +8121,7 @@ svg.navbar-brand-img {
 
 /* table */
 .table {
-  color: #076b26;
+  color: #2d4c5b;
   font-weight: 700; }
   .table thead th {
     color: #002b70; }

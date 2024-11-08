@@ -169,11 +169,15 @@ def fetch_inverter_data(api_base_url):
 
 def plant_detail(request, pk):
     plant = get_object_or_404(Plant, pk=pk)
+    today_date = datetime.now().strftime('%Y-%m-%d')
 
     api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
 
     inverter_response = requests.get(f'{api_base_url}/inverter/')
     inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+
+    modal_response = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}')
+    modal_info = modal_response.json() if modal_response.status_code == 200 else []
 
     inverters_data = []
     for inverter in inverters:
@@ -242,17 +246,16 @@ def plant_detail(request, pk):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
     context = {
         "inverters": inverters,
         'inverters_data': inverters_data,
         'plant': plant,
         'plants': Plant.objects.all(),
         'api_base_url': api_base_url,  
+        'modal_info': json.dumps(modal_info)
     }
     
-    return render(request, 'plant_detail.html', context) 
-
+    return render(request, 'plant_detail.html', context)  
 
 def plant_view(request):
     context = {
@@ -420,6 +423,7 @@ def panel_view(request):
         'total_generate_energy': formatted_total_generate_energy / 1000,
         'total_current_power': formatted_total_current_power,
         'plants': plants,
+        'plants_grid': Plant.objects.all(),
         'plants_json': plants_json,
         'all_data': all_data,
         'inverters': Inverter.objects.all()
@@ -431,3 +435,93 @@ def plants_view(request):
         'plants': Plant.objects.all(),
     }
     return render(request, 'plants.html', context)
+
+def panel_detail(request, pk):
+    plant = get_object_or_404(Plant, pk=pk)
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
+    api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
+
+    inverter_response = requests.get(f'{api_base_url}/inverter/')
+    inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+
+    modal_response = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}')
+    modal_info = modal_response.json() if modal_response.status_code == 200 else []
+
+    inverters_data = []
+    for inverter in inverters:
+        serial_number = inverter['serial_number']
+        data_response = requests.get(f'{api_base_url}/data/last/{serial_number}')
+        inverter_data = {'serial_number': serial_number, 'data': {}}
+        
+        if data_response.status_code == 200:
+            data = data_response.json()
+            if data and 'inverter_registers_data' in data:
+                inverter_data['data'] = data['inverter_registers_data']
+        
+        inverters_data.append(inverter_data)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            selected_date = body.get('selected_date')
+            if selected_date:
+                date_parts = selected_date.split('-')
+                if len(date_parts) == 3:  
+                    chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
+                    chart_response = requests.get(chart_api_url)
+
+                    if chart_response.status_code == 200:
+                        chart_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'chartData': chart_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch daily chart data.'
+                        }
+                elif len(date_parts) == 2: 
+
+                    year, month = date_parts
+                    month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
+                    chart_response = requests.get(month_api_url)
+                    if chart_response.status_code == 200:
+                        month_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'monthData': month_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch monthly chart data.'
+                        }
+                else:
+                    response_data = {
+                        'status': 'error',
+                        'message': 'Invalid date format. Please use YYYY-MM-DD or YYYY/MM.'
+                    }
+            else:
+                response_data = {
+                    'status': 'error',
+                    'message': 'No date provided.'
+                }
+
+            return JsonResponse(response_data)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    context = {
+        "inverters": inverters,
+        'inverters_data': inverters_data,
+        'plant': plant,
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url,  
+        'modal_info': json.dumps(modal_info)
+    }
+    
+    return render(request, 'panel_detail.html', context)  

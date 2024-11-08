@@ -50,6 +50,7 @@
                                 <p class="medium text mb-0"><strong>Текущая выработка - {{inverter.data.current_power.data }} Вт</strong></p>
                             </div>
                         </div> <!-- ./card-text -->
+                        {% include 'status/growatt.html' %}
                     </div>
                 </div> <!-- .col -->    
                 {% endif %}

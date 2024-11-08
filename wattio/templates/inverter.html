@@ -17,20 +17,20 @@
         </div>
         <div class="col-7 d-flex align-items-center justify-content-end align-middle">
           <div class="form-group d-none d-lg-inline mb-0">
-              <label for="reportrange" class="sr-only">Date Ranges</label>
-              <div class="px-2 py-2 text-muted">
-                  <span class="small" id="date-range-text"></span>
-              </div>
+            <label for="reportrange" class="sr-only">Date Ranges</label>
+            <div class="px-2 py-2 text-muted">
+              <span class="small" id="date-range-text"></span>
+            </div>
           </div>
           <!-- <a href="/" id="refresh"><button type="button" class="btn btn-sm" ><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button></a> -->
           <!-- <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#varyModal" data-whatever="@mdo"><span class="fe fe-filter fe-16 text-muted"></span></button> -->
-      </div>
+        </div>
       </div>
       <div id="plant-api" data-location="{{ api_base_url }}"></div>
       <div class="card shadow my-4">
         <div class="card-body">
           <div class="row align-items-center my-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="mx-4">
                 <div class="mx-4">
                   {% if info.name == 'growatt' %}
@@ -45,71 +45,40 @@
                 <h3 id="serial_number" data-location="{{ inverter.serial_number }}">{{ inverter.serial_number }}</h3>
                 <p class="text-muted">Основные показатели работы инвертора</p>
               </div>
-              <div class="row align-items-center">
-                <div class="col-6">
-                  <div class="p-4">
-                    <p class="small text-uppercase text-muted mb-0">Всего выработано </p>
-                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.total_generate_energy.data }} -
-                      кВт*ч</span>
-                    <p class="small mb-0">
-                      <span class="fe fe-arrow-up text-success fe-12"></span>
-                      <span class="text-muted ml-1">+1.5%</span>
-                    </p>
-                  </div>
+              <div class="col-12">
+                <div class="p-4">
+                  <p class="small text-uppercase text-muted mb-0">Всего выработано </p>
+                  <span class="h3 mb-0">{{ inverter.inverter_registers_data.total_generate_energy.data }} -
+                    кВт*ч</span>
+                  <p class="small mb-0">
+                    <span class="fe fe-arrow-up text-success fe-12"></span>
+                    <span class="text-muted ml-1">+1.5%</span>
+                  </p>
                 </div>
               </div>
-              <div class="row align-items-center">
-                <div class="col-6">
-                  <div class="p-4">
-                    <p class="small text-uppercase text-muted mb-0">Текущая выработка</p>
-                    <span class="h3 mb-0">{{ inverter.inverter_registers_data.current_power.data }} - Вт</span>
-                    <p class="small mb-0">
-                      <span class="fe fe-arrow-up text-success fe-12"></span>
-                    </p>
-                  </div>
+              <div class="col-12">
+                <div class="p-4">
+                  <p class="small text-uppercase text-muted mb-0">Текущая выработка</p>
+                  <span class="h3 mb-0">{{ inverter.inverter_registers_data.current_power.data }} - Вт</span>
+                  <p class="small mb-0">
+                    <span class="fe fe-arrow-up text-success fe-12"></span>
+                  </p>
                 </div>
-                <div class="col-6">
-                  <div class="p-4">
-                    <p class="small text-uppercase text-muted mb-0">Температура</p>
-                    <span class="h2 mb-0">{{ inverter.inverter_registers_data.temperature.data }} - ℃</span>
-                    <p class="small mb-0">
-                      <span class="fe fe-arrow-up text-success fe-12"></span>
-                    </p>
-                  </div>
+              </div>
+              <div class="col-12">
+                <div class="p-4">
+                  <p class="small text-uppercase text-muted mb-0">Температура</p>
+                  <span class="h2 mb-0">{{ inverter.inverter_registers_data.temperature.data }} - ℃</span>
+                  <p class="small mb-0">
+                    <span class="fe fe-arrow-up text-success fe-12"></span>
+                  </p>
                 </div>
               </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
               {% include 'widgets/inv-charts.html'%}
             </div> <!-- .col-md-8 -->
           </div> <!-- end section -->
-          <!--<div class="row align-items-center my-4">
-            <div class="col-md-12">
-              <h5 class="card-title">Архив показаний на {% today %}</h5>
-              <table class="table table-sm table-bordered table-hover mb-0 scrollable-table">
-                <thead>
-                  <tr>
-                    <th class="number-column">№</th>
-                    <th>Время</th>
-                    <th>Выработка</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for info in modal_info %} 
-                  {% if inverter.serial_number == info.serial_number %}
-                  {% for data in info.data_list %} 
-                  <tr>
-                    <td class="number-column">{{ forloop.counter }}</td>
-                    <td>{{ data.create_date|dates }}</td>
-                    <td><strong>{{ data.data}} Вт</strong> </td>
-                  </tr>
-                  {% endfor %}
-                  {% endif %}
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>-->
         </div> <!-- .card-body -->
       </div> <!-- .card -->
     </div>
@@ -118,9 +87,9 @@
 {% endblock main %}
 {% block scripts %}
 <script>
-  setInterval(function() {
-            window.location.reload();
-        }, 5 * 60 * 1000);
+  setInterval(function () {
+    window.location.reload();
+  }, 5 * 60 * 1000);
 </script>
 <script src="{% static 'js/calendar.js' %}"></script>
 <script src="{% static 'js/apexcharts.min.js' %}"></script>

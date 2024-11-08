@@ -29,7 +29,7 @@ mapUZBox && (mapUZB = new Datamap({
         var width = element.offsetWidth;
         var height = element.offsetHeight;
 
-        var scale = Math.min(width, height) * 5;
+        var scale = Math.min(width, height) * 4;
 
         var centerLongitude = 60;
         var centerLatitude = 39;
