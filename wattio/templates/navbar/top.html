@@ -10,21 +10,18 @@
               <i class="fe fe-sun fe-16"></i>
             </a>
         </li>
-        <!-- <li class="nav-item nav-notif">
-            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target="#plantModal" data-whatever="@mdo">
-                <span class="fe fe-plus fe-16" style="font-family: sans-serif">Добавить станцию</span>
-            </a>
-        </li> -->
+        {% if user.is_authenticated %}
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="avatar avatar-sm mt-2">
-                    <img src="{% static 'assets/avatars/1.png' %}" alt="..." class="avatar-img rounded-circle">
+                    <img src="{% static 'assets/avatars/1.png' %}" alt="User Avatar" class="avatar-img rounded-circle">
                 </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
             </div>
         </li>
+        {% endif %}
     </ul>
 </nav>

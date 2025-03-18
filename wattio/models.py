@@ -14,9 +14,7 @@ class Plant(models.Model):
         verbose_name='Название станции',
         unique=True
     )
-    power = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
+    power = models.FloatField(
         verbose_name='Общая мощность (кВт)',
         blank=True,
         null=True
