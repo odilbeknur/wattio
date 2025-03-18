@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Plant, Inverter
+from .models import Plant, Inverter, APIEndpoint
 
 @admin.register(Plant)
 class PlantAdmin(admin.ModelAdmin):
@@ -12,3 +12,9 @@ class InverterAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'serial', 'plant', 'color']
     search_fields = ['name', 'serial']  
     list_filter = ['color', 'plant'] 
+
+@admin.register(APIEndpoint)
+class APIEndpoint(admin.ModelAdmin):
+    list_display = ['id', 'url', 'plant']
+    search_fields = ['url', 'plant'] 
+    list_filter = ['url']

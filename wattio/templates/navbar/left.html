@@ -8,14 +8,14 @@
         <!-- nav bar -->
         <div class="w-100 mb-4 d-flex">
             <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{% url 'index' %}">
-                <img src="{% static 'assets/images/logo.png' %}" id="logo" alt="">
+                <img src="{% static 'assets/images/logo.png' %}" id="logo" alt="" style="max-width:40px">
             </a>
         </div>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                <a href="{% url 'index' %}" style="text-decoration: none;">
+                <a href="{% url 'index' %}" style="text-decoration: none; text-transform: uppercase;">
                     <i class="fe fe-home fe-16"></i>
-                    <span class="ml-3 item-text">Дашборд</span><span class="sr-only">(current)</span>
+                    <span class="ml-3 item-text">Дашборд</span>
                 </a>
             </li>
         </ul>
@@ -24,7 +24,7 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                <a href="#plants" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                <a href="#plants" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link" style="text-decoration: none; text-transform: uppercase;">
                     <i class="fe fe-cpu fe-16"></i>
                     <span class="ml-3 item-text">Станции</span>
                 </a>
@@ -43,19 +43,19 @@
                 </ul>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="/">
+                <a class="nav-link" href="/" style="text-decoration: none; text-transform: uppercase;">
                     <i class="fe fe-bar-chart fe-16"></i>
                     <span class="ml-3 item-text">Графики</span>
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="/">
+                <a class="nav-link" href="/" style="text-decoration: none; text-transform: uppercase;">
                     <i class="fe fe-trello fe-16"></i>
                     <span class="ml-3 item-text">Таблицы</span>
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="/">
+                <a class="nav-link" href="/" style="text-decoration: none; text-transform: uppercase;">
                     <i class="fe fe-alert-octagon fe-16"></i>
                     <span class="ml-3 item-text">Журнал ошибок</span>
                 </a>

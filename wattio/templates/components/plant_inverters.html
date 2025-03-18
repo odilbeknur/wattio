@@ -1,5 +1,82 @@
 {% load static %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% get_plant_summary plant.id as summary %}
 <div class="container-fluid">
+<h1 style="text-align:center">{{ plant.name }}</h1>
+
+    <div class="row align-items-center mt-3">
+        <div class="col-xl-4 col-lg-4">
+            <div class="card l-bg-orange-dark">
+                <div class="card-statistic-3 p-4">
+                    <div class="card-icon card-icon-large"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="mb-4">
+                        <h5 class="card-title mb-0">Текущая выработка</h5>
+                    </div>
+                    <div class="row align-items-center mb-2 d-flex">
+                        <div class="col-8">
+                            <h2 class="d-flex align-items-center mb-0">
+                                {{ summary.current_power|floatformat:2|intcomma }} Вт
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                        <div class="progress-bar l-bg-cyan" role="progressbar" data-width="65%" aria-valuenow="25"
+                            aria-valuemin="0" aria-valuemax="100" style="width: 65%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-lg-4">
+            <div class="card l-bg-green-dark">
+                <div class="card-statistic-3 p-4">
+                    <div class="card-icon card-icon-large"><i class="fas fa-ticket-alt"></i></div>
+                    <div class="mb-4">
+                        <h5 class="card-title mb-0">Выработано (сегодня)</h5>
+                    </div>
+                    <div class="row align-items-center mb-2 d-flex">
+                        <div class="col-8">
+                            <h2 class="d-flex align-items-center mb-0">
+                                {{ summary.today_generate_energy|floatformat:2|intcomma }} кВт
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                        <div class="progress-bar l-bg-orange" role="progressbar" data-width="100%" aria-valuenow="25"
+                            aria-valuemin="0" aria-valuemax="100" style="width: 35%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-4">
+            <div class="card l-bg-blue-dark">
+                <div class="card-statistic-3 p-4">
+                    <div class="card-icon card-icon-large"><i class="fas fa-users"></i></div>
+                    <div class="mb-4">
+                        <h5 class="card-title mb-0">Выработано (за все время)</h5>
+                    </div>
+                    <div class="row align-items-center mb-2 d-flex">
+                        <div class="col-8">
+                            <h2 class="d-flex align-items-center mb-0">
+                                {{ summary.total_generate_energy|floatformat:2|intcomma }} кВт
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="progress mt-1 " data-height="8" style="height: 8px;">
+                        <div class="progress-bar l-bg-green" role="progressbar" data-width="25%" aria-valuenow="25"
+                            aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Column -->
+        <div class="col-md-6 mb-4">
+            <div id="container" class="chart-container"></div>
+        </div>
+    </div>
     <div class="row justify-content-center">
         <div class="col-12">
             <div class="row align-items-center mb-2">
@@ -24,10 +101,10 @@
                 <div id="plant-id" data-location="{{ plant.id }}"></div>
                 <div id="plant-data" data-location="{{ plant.address }}"></div>
                 <div id="plant-api" data-location="{{ api_base_url }}"></div>
-                {% for inv in inverters %} 
-                {% if inv.location == plant.address %} 
-                {% for inverter in inverters_data %} 
-                {% if inverter.serial_number == inv.serial_number %} 
+                {% for inv in inverters %}
+                {% if inv.location == plant.address %}
+                {% for inverter in inverters_data %}
+                {% if inverter.serial_number == inv.serial_number %}
                 <div class="col-md-3">
                     <div class="card shadow mb-4 clickable-card" id="inverterModal" data-toggle="modal"
                         data-target=".modal-shortcut" data-name="{{ inverter.name }}"
@@ -44,15 +121,18 @@
                             <div class="card-text my-2">
                                 <p class="medium"><strong class="card-title my-0"><span class="h3"
                                             style="text-transform: uppercase;">{{ inv.name }}</span></strong></p>
-                                <p class="medium"><strong class="card-title my-0"><span class="badge badge-info">{{inv.serial_number }}</span></strong></p>
-                                <p class="medium text mb-0"><strong>Всего выработано - {{inverter.data.total_generate_energy.data }} кВт*ч</strong></p>
+                                <p class="medium"><strong class="card-title my-0"><span
+                                            class="badge badge-info">{{inv.serial_number }}</span></strong></p>
+                                <p class="medium text mb-0"><strong>Всего выработано -
+                                        {{inverter.data.total_generate_energy.data }} кВт*ч</strong></p>
                                 <!-- <p class="medium text mb-0"><strong>Время работы (всего) - {{inverter.data.work_time_total.data }} ч</strong></p> -->
-                                <p class="medium text mb-0"><strong>Текущая выработка - {{inverter.data.current_power.data }} Вт</strong></p>
+                                <p class="medium text mb-0"><strong>Текущая выработка -
+                                        {{inverter.data.current_power.data }} Вт</strong></p>
                             </div>
                         </div> <!-- ./card-text -->
                         {% include 'status/growatt.html' %}
                     </div>
-                </div> <!-- .col -->    
+                </div> <!-- .col -->
                 {% endif %}
                 {% endfor %}
                 {% endif %}

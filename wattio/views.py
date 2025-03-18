@@ -8,6 +8,7 @@ from .forms import InverterForm, PlantForm
 from .models import *
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
+from collections import defaultdict
 import json
 
 def logout_view(request):
@@ -43,76 +44,84 @@ def fetch_data_from_api(url):
 
 
 def index(request):
+    # Общая мощность всех станций
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
     formatted_total_power = round(float(total_power), 2)  
 
+    
+
+    # Загружаем все станции и их API-адреса
     plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
     
     for plant in plants:
         plant['power'] = float(plant['power']) 
+
+        # Получаем API-адреса и добавляем к ним окончание
+        plant['api_urls'] = [
+            f"{url.rstrip('/')}/data/chart/last/all/"  
+            for url in APIEndpoint.objects.filter(plant_id=plant['id']).values_list('url', flat=True)
+        ]
     
     plants_json = json.dumps(plants)
 
-    api_urls = [
-        "http://10.20.6.30:8080/data/chart/last/all/",
-        "http://10.20.96.35:8080/data/chart/last/all/",
-        "http://10.28.28.50:8080/data/chart/last/all/",
-        'http://10.20.77.30:8080/data/chart/last/all/'
-    ]
-
-    
+    # Переменные для суммирования данных
     total_today_generate_energy = 0
     total_generate_energy = 0
     total_current_power = 0
     all_data = []
 
-    for url in api_urls:
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise exception for HTTP errors
-            data = response.json()
+    # Запросы к API всех станций
+    for plant in plants:    
+        if plant['address'] == "SOZLASH_MAIN":
+            continue 
+        for url in plant['api_urls']:
+            try:
+                response = requests.get(url, timeout=5)  
+                response.raise_for_status()  
+                data = response.json()
 
-            # Combine processing for summing and storing location data
-            for location, inverters in data.items():
-                for inverter in inverters:
-                        registers_data = inverter.get("inverter_registers_data", {})
-                        current_power = float(registers_data["current_power"]["data"])
-                        today_energy = float(registers_data["today_generate_energy"]["data"])
-                        total_energy = float(registers_data["total_generate_energy"]["data"])
-                        serial_number = inverter['serial_number']
-                        status = ''
-                        if inverter['serial_number'] != "All":
-                            status = registers_data['status']
-                            # Accumulate totals
-                            total_current_power += current_power
-                            total_today_generate_energy += today_energy
-                            total_generate_energy += total_energy
-                        
-                        # Store location and inverter data
-                        all_data.append({
-                            "location": location,
-                            'serial_number' : serial_number,
-                            "current_power": current_power,
-                            "today_generate_energy": today_energy,
-                            "total_generate_energy": total_energy,
-                            "status": status,
-                        })
+                for location, inverters in data.items():
+                    for inverter in inverters:
+                        try:
+                            registers_data = inverter.get("inverter_registers_data", {})
+                            current_power = float(registers_data["current_power"]["data"])
+                            today_energy = float(registers_data["today_generate_energy"]["data"])
+                            total_energy = float(registers_data["total_generate_energy"]["data"])
+                            serial_number = inverter['serial_number']
+                            status = ''
 
-            print("Processed data from:", url)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching data from {url}: {e}")
-        except KeyError as e:
-            print(f"KeyError when parsing data from {url}: {e}")
-        except ValueError as e:
-            print(f"ValueError when processing data from {url}: {e}")  
+                            if serial_number != "All":
+                                status = registers_data.get('status', 'Unknown')  # Если статус отсутствует, ставим "Unknown"
+                                total_current_power += current_power
+                                total_today_generate_energy += today_energy
+                                total_generate_energy += total_energy
+                            
+                            all_data.append({
+                                "location": location,
+                                'serial_number': serial_number,
+                                "current_power": current_power,
+                                "today_generate_energy": today_energy,
+                                "total_generate_energy": total_energy,
+                                "status": status,
+                            })
+                        except (KeyError, ValueError, TypeError) as e:
+                            print(f"Error processing inverter data from {url}: {e}")
+            except requests.exceptions.Timeout:
+                print(f"Timeout error: {url} did not respond in time.")
+            except requests.exceptions.ConnectionError:
+                print(f"Connection error: Could not connect to {url}.")
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP error: {url} returned {e.response.status_code}.")
+            except requests.exceptions.RequestException as e:
+                print(f"RequestException: {url} encountered an error: {e}")
+            except json.JSONDecodeError:
+                print(f"JSON decode error: Could not parse response from {url}.")
 
-
-    # Format the totals
+    # Форматируем итоговые данные
     formatted_total_today_energy = round(total_today_generate_energy, 2)
     formatted_total_generate_energy = round(total_generate_energy, 2)
-    formatted_total_current_power = round(total_current_power/1000, 2)
+    formatted_total_current_power = round(total_current_power / 1000, 2)
 
-    # Context data to pass to the template
     context = {
         'total_power': formatted_total_power,
         'total_today_generate_energy': formatted_total_today_energy,
@@ -124,6 +133,7 @@ def index(request):
         'inverters': Inverter.objects.all()
     }
     return render(request, 'index.html', context)
+
 
 def plants_view(request):
     context = {
@@ -138,7 +148,7 @@ API_URLS = {
     "TASHKENT_TTC": 'http://10.20.96.35:8080',
     "SIRDARYA_TPP": 'http://10.28.28.50:8080',
     "MUBAREK_TPP": 'http://10.20.77.30:8080',
-    "TALIMARJAN_TPP": 'http://10.20.6.60:8080/'
+    "FERGANA_TPC": 'http://10.20.45.30:8080'
 }
 
 def fetch_inverter_data(api_base_url):
@@ -171,7 +181,9 @@ def plant_detail(request, pk):
     plant = get_object_or_404(Plant, pk=pk)
     today_date = datetime.now().strftime('%Y-%m-%d')
 
-    api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
+    api_endpoints = list(plant.endpoints.all().values_list('url', flat=True))
+
+    api_base_url = api_endpoints[0]
 
     inverter_response = requests.get(f'{api_base_url}/inverter/')
     inverters = inverter_response.json() if inverter_response.status_code == 200 else []
@@ -246,6 +258,7 @@ def plant_detail(request, pk):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
     context = {
         "inverters": inverters,
         'inverters_data': inverters_data,
@@ -277,7 +290,7 @@ def inverter_view(request, serial_number):
         api_base_url = 'http://10.28.28.50:8080'
     elif inverter.plant.address == "MUBAREK_TPP":
         api_base_url = 'http://10.20.77.30:8080'
-    elif inverter.plant.address == "TALIMARJAN_TPP":
+    elif inverter.plant.address == "FERGANA_TPC":
         api_base_url = 'http://10.20.6.60:8080/'
     else:
         api_base_url = 'http://10.20.6.30:8080/'
@@ -345,90 +358,95 @@ def edit_plant(request, plant_id):
     return render(request, 'plant_edit.html', {'form': form, 'plant': plant})
 
 
-
+from django.conf import settings
 def panel_view(request):
+    # Общая мощность всех станций
     total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
     formatted_total_power = round(float(total_power), 2)  
 
+    # Загружаем все станции и их API-адреса
     plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
     
     for plant in plants:
         plant['power'] = float(plant['power']) 
+
+        # Получаем API-адреса и добавляем к ним окончание
+        plant['api_urls'] = [
+            f"{url.rstrip('/')}/data/chart/last/all/"  
+            for url in APIEndpoint.objects.filter(plant_id=plant['id']).values_list('url', flat=True)
+        ]
     
     plants_json = json.dumps(plants)
 
-    api_urls = [
-        "http://10.20.6.30:8080/data/chart/last/all/",
-        "http://10.20.96.35:8080/data/chart/last/all/",
-        "http://10.28.28.50:8080/data/chart/last/all/",
-        'http://10.20.77.30:8080/data/chart/last/all/'
-    ]
-
-    
+    # Переменные для суммирования данных
     total_today_generate_energy = 0
     total_generate_energy = 0
     total_current_power = 0
     all_data = []
 
-    for url in api_urls:
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Raise exception for HTTP errors
-            data = response.json()
+    # Запросы к API всех станций
+    for plant in plants:
+        for url in plant['api_urls']:
+            try:
+                response = requests.get(url, timeout=5)  
+                response.raise_for_status()  
+                data = response.json()
 
-            # Combine processing for summing and storing location data
-            for location, inverters in data.items():
-                for inverter in inverters:
-                        registers_data = inverter.get("inverter_registers_data", {})
-                        current_power = float(registers_data["current_power"]["data"])
-                        today_energy = float(registers_data["today_generate_energy"]["data"])
-                        total_energy = float(registers_data["total_generate_energy"]["data"])
-                        serial_number = inverter['serial_number']
-                        status = ''
-                        if inverter['serial_number'] != "All":
-                            status = registers_data['status']
-                            # Accumulate totals
-                            total_current_power += current_power
-                            total_today_generate_energy += today_energy
-                            total_generate_energy += total_energy
-                        
-                        # Store location and inverter data
-                        all_data.append({
-                            "location": location,
-                            'serial_number' : serial_number,
-                            "current_power": current_power,
-                            "today_generate_energy": today_energy,
-                            "total_generate_energy": total_energy,
-                            "status": status,
-                        })
+                for location, inverters in data.items():
+                    for inverter in inverters:
+                        try:
+                            registers_data = inverter.get("inverter_registers_data", {})
+                            current_power = float(registers_data["current_power"]["data"])
+                            today_energy = float(registers_data["today_generate_energy"]["data"])
+                            total_energy = float(registers_data["total_generate_energy"]["data"])
+                            serial_number = inverter['serial_number']
+                            status = ''
 
-            print("Processed data from:", url)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching data from {url}: {e}")
-        except KeyError as e:
-            print(f"KeyError when parsing data from {url}: {e}")
-        except ValueError as e:
-            print(f"ValueError when processing data from {url}: {e}")  
+                            if serial_number != "All":
+                                status = registers_data.get('status', 'Unknown')  # Если статус отсутствует, ставим "Unknown"
+                                total_current_power += current_power
+                                total_today_generate_energy += today_energy
+                                total_generate_energy += total_energy
+                            
+                            all_data.append({
+                                "location": location,
+                                'serial_number': serial_number,
+                                "current_power": current_power,
+                                "today_generate_energy": today_energy,
+                                "total_generate_energy": total_energy,
+                                "status": status,
+                            })
+                        except (KeyError, ValueError, TypeError) as e:
+                            print(f"Error processing inverter data from {url}: {e}")
 
+            except requests.exceptions.Timeout:
+                print(f"Timeout error: {url} did not respond in time.")
+            except requests.exceptions.ConnectionError:
+                print(f"Connection error: Could not connect to {url}.")
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP error: {url} returned {e.response.status_code}.")
+            except requests.exceptions.RequestException as e:
+                print(f"RequestException: {url} encountered an error: {e}")
+            except json.JSONDecodeError:
+                print(f"JSON decode error: Could not parse response from {url}.")
 
-    # Format the totals
+    # Форматируем итоговые данные
     formatted_total_today_energy = round(total_today_generate_energy, 2)
     formatted_total_generate_energy = round(total_generate_energy, 2)
-    formatted_total_current_power = round(total_current_power/1000, 2)
+    formatted_total_current_power = round(total_current_power / 1000, 2)
 
-    # Context data to pass to the template
     context = {
         'total_power': formatted_total_power,
         'total_today_generate_energy': formatted_total_today_energy,
         'total_generate_energy': formatted_total_generate_energy / 1000,
         'total_current_power': formatted_total_current_power,
         'plants': plants,
-        'plants_grid': Plant.objects.all(),
         'plants_json': plants_json,
         'all_data': all_data,
         'inverters': Inverter.objects.all()
     }
     return render(request, 'panel.html', context)
+
 
 def plants_view(request):
     context = {
@@ -515,6 +533,7 @@ def panel_detail(request, pk):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
     context = {
         "inverters": inverters,
         'inverters_data': inverters_data,

@@ -116,3 +116,14 @@ class Inverter(models.Model):
     class Meta:
         verbose_name = 'Инвертор'
         verbose_name_plural = 'Инверторы'
+
+class APIEndpoint(models.Model):
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='endpoints', help_text="Станция для которой предназначен API", null=True, blank=True)
+    url = models.URLField(help_text="URL API-эндпоинта")
+
+    def __str__(self):
+        return self.url
+    
+    class Meta:
+        verbose_name = 'API-эндпоинт'
+        verbose_name_plural = 'API-эндпоинты'

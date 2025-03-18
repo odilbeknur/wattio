@@ -1,4 +1,3 @@
-
 services:
   wattio_db:
     restart: always
@@ -13,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /var/lib/docker/volumes/wattio_postgres_data/_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/
 
   django:
     restart: always

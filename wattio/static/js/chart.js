@@ -54,8 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
           const response = await fetch(apiURL);
           const data = await response.json();
           updateChart(data);
-
-          console.log(data)
       }
   }
 

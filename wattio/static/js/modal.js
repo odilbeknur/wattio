@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Parse the modalInfo JSON data
         var modalInfoData = document.getElementById('modal-info-data').textContent;
         var modalInfo = JSON.parse(modalInfoData);
-        console.log(modalInfo)
 
 
         // Find the entry in modalInfo matching the serial number

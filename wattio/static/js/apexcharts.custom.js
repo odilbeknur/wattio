@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const chartColors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#3F51B5", "#03A9F4", "#4CAF50", "#F9CE1D", "#FF9800"];
     apiBaseURL = document.getElementById('plant-api').getAttribute('data-location');
-       
+    plant_location = document.getElementById('plant-data').getAttribute('data-location');   
     // Initialize Flatpickr for Month Picker
     const monthPicker = flatpickr("#monthpicker", {
         plugins: [new monthSelectPlugin({ shorthand: true, dateFormat: "Y/m", theme: "light" })],
@@ -66,7 +66,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
             } } },
             yaxis: { labels: { show: true, formatter: val => val + " Вт" }, },
-            legend: { position: "top", markers: { fillColors: chartColors } },
+            legend: { 
+                position: "top",
+                markers: { fillColors: chartColors },
+                labels: { colors: "#289cf5" }, // Change legend text color (red in this case)
+            },
             grid: { show: true }
         };
     }
@@ -99,11 +103,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRFToken': csrfToken
                 },
                 success: function(responseData) {
-                    console.log('Django response:', responseData);
+                    console.log(responseData);
 
                     // Check if the response is successful
                     if (responseData.status === 'success' && responseData.monthData) {
-                        const seriesData = responseData.monthData.map((item, index) => ({
+                        const seriesData = responseData.monthData
+                        .filter(item => item.location === plant_location)
+                        .map((item, index) => ({
                             name: item.serial_number,
                             data: item.data_list.map(dataItem => {
                                 let date = new Date(dataItem.create_date);
@@ -134,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(datePicker.selectedDates[0]);
         const apiURL = `/plant/${plantID}/`; 
-        console.log("URL for Django", apiURL);
 
         if (dateValue) {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -149,12 +154,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         'X-CSRFToken': csrfToken
                     },
                     success: function(responseData) {
-                        console.log('Django response:', responseData);
         
                         // Check if the response is successful
                         if (responseData.status === 'success' && responseData.chartData) {
-                            const seriesData = responseData.chartData.map((item, index) => ({
-                                name: item.serial_number,
+                            const seriesData = responseData.chartData
+                            .filter(item => item.location === plant_location)
+                            .map((item, index) => ({
+                                name: item.serial_number    ,
                                 data: item.data_list.map(dataItem => {
                                     let date = new Date(dataItem.create_date);
                                     date.setHours(date.getHours() + 5); // Adjust the timezone if necessary

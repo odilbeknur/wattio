@@ -1,7 +1,9 @@
-<div class="card-footer" style="border-top:3px solid {{ widget.color }};">
+<div class="card-footer" style="border-top:3px solid #3ad29f;">
     <div class="row align-items-center justify-content-between">
         <div class="col-auto">
             {% if inverter.data.status.data == '1' %}
+            <small><span class="dot dot-lg bg-success mr-1"></span> Online </small>
+            {% elif inverter.data.status.data == '2' %}
             <small><span class="dot dot-lg bg-success mr-1"></span> Online </small>
             {% elif inverter.data.status.data == '0' %}
             <small><span class="dot dot-lg bg-secondary mr-1"></span> Waiting </small>

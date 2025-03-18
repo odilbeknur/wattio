@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var inverterSerialNumber = document.getElementById('serial_number').getAttribute('data-location');
     apiBaseUrl = document.getElementById('plant-api').getAttribute('data-location');
 
-    console.log("BASE URL: ", apiBaseUrl)
-
     // Initialize Flatpickr for Month Picker
     const monthPicker = flatpickr("#monthpicker", {
         plugins: [new monthSelectPlugin({ shorthand: true, dateFormat: "Y/m", theme: "light" })],
@@ -100,7 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const monthValue = `${year}/${month}`; // Combine year and month in "YYYY/MM" format
         
         const apiURL = `${apiBaseUrl}/data/chart/month/${inverterSerialNumber}/${monthValue}`;
-        console.log(apiURL);
         try {
             const response = await fetch(apiURL);
             if (!response.ok) {
@@ -109,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
             const dataList = await response.json();
             const dataresponse = dataList.data_list;
-            console.log(dataresponse);
             if (dataresponse.length > 0) {
                 const seriesData = [{
                     name: inverterSerialNumber,
@@ -138,13 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const dateValue = formatDate(datePicker.selectedDates[0]);
         if (dateValue) {
             const apiURL = `${apiBaseUrl}/data/chart/day/${inverterSerialNumber}/${dateValue}`;
-            console.log("line chart", apiURL, apiURL)
             try {
                 const response = await fetch(apiURL);
                 const dataList = await response.json();
-                console.log(dataList.data_list.length);
                 const dataresponse = dataList.data_list;
-                console.log('Dataresponse: ', dataresponse)
                 if (dataresponse.length > 0) {
                     const seriesData = [{
                         name: inverterSerialNumber,

@@ -169,18 +169,16 @@
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {% for inverter in inverters %}
-                                      {% if inverter.plant.address|striptags|cut:" " == plant.address|striptags|cut:" "%}
                                       {% for d in all_data %} 
-                                      {% if d.serial_number == inverter.serial %} 
+                                      {% if d.location == plant.address and d.serial_number != "All" %}
                                       <tr>
                                         <td>{{ d.serial_number }}</td>
                                         <td>{{ d.total_generate_energy }} кВт</td>
                                         <td>{{ d.today_generate_energy }} кВт</td>
                                         <td>{{ d.current_power }} Вт</td>
                                         <td>
-                                          <span class="badge badge-{% if d.status.data == "1" or d.status.data == "3"  %}success{% else %}secondary{% endif %}">
-                                            {% if d.status.data == "1" %}
+                                          <span class="badge badge-{% if d.status.data == "1" or d.status.data == "2" or d.status.data == "3"  %}success{% else %}secondary{% endif %}">
+                                            {% if d.status.data == "1" or d.status.data == "2" %}
                                             Online
                                             {% elif d.status.data == "3" %}
                                             Offline
@@ -190,8 +188,6 @@
                                         </span>
                                         </td>
                                       </tr>
-                                      {% endif %}
-                                      {% endfor %}
                                       {% endif %}
                                       {% endfor %}
                                     </tbody>

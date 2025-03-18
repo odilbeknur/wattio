@@ -27,11 +27,11 @@
                                 <div class="card-statistic-3 p-4">
                                     <div class="card-icon card-icon-large"><i class="fas fa-shopping-cart"></i></div>
                                     <div class="mb-4">
-                                        <h5 class="card-title mb-0" style = "color:#fff ">Проектная мощность</h5>
+                                        <h5 class="card-title mb-0">Проектная мощность</h5>
                                     </div>
                                     <div class="row align-items-center mb-2 d-flex">
                                         <div class="col-8">
-                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                            <h2 class="d-flex align-items-center mb-0">
                                               {{ total_power|floatformat:2|intcomma }} кВт
                                             </h2>
                                         </div>
@@ -47,11 +47,11 @@
                                 <div class="card-statistic-3 p-4">
                                     <div class="card-icon card-icon-large"><i class="fas fa-users"></i></div>
                                     <div class="mb-4">
-                                        <h5 class="card-title mb-0" style = "color:#fff ">Выработано (за все время)</h5>
+                                        <h5 class="card-title mb-0">Выработано (за все время)</h5>
                                     </div>
                                     <div class="row align-items-center mb-2 d-flex">
                                         <div class="col-8">
-                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                            <h2 class="d-flex align-items-center mb-0">
                                               {{ total_generate_energy|floatformat:2|intcomma }} МВт
                                             </h2>
                                         </div>
@@ -67,11 +67,11 @@
                                 <div class="card-statistic-3 p-4">
                                     <div class="card-icon card-icon-large"><i class="fas fa-ticket-alt"></i></div>
                                     <div class="mb-4">
-                                        <h5 class="card-title mb-0" style = "color:#fff ">Выработано (сегодня)</h5>
+                                        <h5 class="card-title mb-0">Выработано (сегодня)</h5>
                                     </div>
                                     <div class="row align-items-center mb-2 d-flex">
                                         <div class="col-8">
-                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                            <h2 class="d-flex align-items-center mb-0">
                                               {{ total_today_generate_energy|floatformat:2|intcomma }} кВт
                                             </h2>
                                         </div>
@@ -87,11 +87,11 @@
                                 <div class="card-statistic-3 p-4">
                                     <div class="card-icon card-icon-large"><i class="fas fa-dollar-sign"></i></div>
                                     <div class="mb-4">
-                                        <h5 class="card-title mb-0" style = "color:#fff ">Текущая выработка</h5>
+                                        <h5 class="card-title mb-0">Текущая выработка</h5>
                                     </div>
                                     <div class="row align-items-center mb-2 d-flex">
                                         <div class="col-8">
-                                            <h2 class="d-flex align-items-center mb-0" style = "color:#fff ">
+                                            <h2 class="d-flex align-items-center mb-0">
                                               {{ total_current_power|intcomma }} кВт
                                             </h2>
                                         </div>
@@ -121,14 +121,14 @@
                         </div> -->
                       </div>
                       <div class="row">
-                        {% for plant in plants_grid%}
+                        {% for plant in plants%}
                         <div class="col-md-2">
                           <a href="{% url 'panel_detail' plant.id %}" class="text-decoration-none card-link">
                               
                             <div class="card shadow mb-4 hover-card">
                               <!-- Card Header for Cover Image -->
                               <div class="card-header p-0">
-                                <img src="{{ plant.image.url }}" alt="" class="img-fluid rounded-top"> 
+                                <img src="/media/{{ plant.image }}" alt="" class="img-fluid rounded-top">   
                               </div>
                               <div class="card-body text-center"> 
                                 <div class="card-text my-2">

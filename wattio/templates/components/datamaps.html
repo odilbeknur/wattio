@@ -107,7 +107,6 @@
     }));
 
     var oblasts = JSON.parse('{{ plants_json|escapejs }}');
-    console.log(oblasts)
 
     mapUZB.bubbles(oblasts.map(function (oblast) {
         return {

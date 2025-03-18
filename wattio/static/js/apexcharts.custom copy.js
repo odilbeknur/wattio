@@ -105,9 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'selected_date': monthValue  
             })
         });
-        console.log(monthValue);
         const responseData = await response.json();
-        console.log('Django response:', responseData);
 
         // Check if the response is successful
         if (responseData.status === 'success' && responseData.monthData) {
@@ -139,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function fetchDataAndUpdateChart() {
         const dateValue = formatDate(datePicker.selectedDates[0]);
         const apiURL = `/plant/${plantID}/`; 
-        console.log("URL for Django", apiURL);
 
         if (dateValue) {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -155,9 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         'selected_date': dateValue  // Send the selected date
                     })
                 });
-                console.log("Response: ", response);
                 const responseData = await response.json();
-                console.log('Django response:', responseData);
     
                 // Check if the response is successful
                 if (responseData.status === 'success' && responseData.chartData) {

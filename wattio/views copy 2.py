@@ -1,0 +1,535 @@
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
+from django.http import JsonResponse
+from datetime import datetime
+import requests
+from .decorators import login_required
+from .forms import InverterForm, PlantForm
+from .models import *
+from django.shortcuts import get_object_or_404
+from django.db.models import Sum
+import json
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+
+def inverter_create(request):
+    if request.method == 'POST':
+        form = InverterForm(request.POST, request.FILES)
+        if form.is_valid():
+            exam = form.save()
+            exam.save()
+            return redirect('index')
+    else:
+        form = InverterForm()
+        context = {
+            'form': form,
+            'title': 'Добавить инвертор'
+        }
+        return render(request, 'index.html', context)
+
+ 
+def fetch_data_from_api(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  
+        return response.json(), None
+    except requests.RequestException as e:
+        print(f"Error fetching data from {url}: {e}")
+        return None, str(e)
+
+
+def index(request):
+    # Общая мощность всех станций
+    total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
+    formatted_total_power = round(float(total_power), 2)  
+
+    # Загружаем все станции и их API-адреса
+    plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
+    
+    for plant in plants:
+        plant['power'] = float(plant['power']) 
+
+        # Получаем API-адреса и добавляем к ним окончание
+        plant['api_urls'] = [
+            f"{url.rstrip('/')}/data/chart/last/all/"  
+            for url in APIEndpoint.objects.filter(plant_id=plant['id']).values_list('url', flat=True)
+        ]
+    
+    plants_json = json.dumps(plants)
+
+    # Переменные для суммирования данных
+    total_today_generate_energy = 0
+    total_generate_energy = 0
+    total_current_power = 0
+    all_data = []
+
+    # Запросы к API всех станций
+    for plant in plants:
+        for url in plant['api_urls']:
+            try:
+                response = requests.get(url, timeout=5)  # Установлен таймаут на 5 секунд
+                response.raise_for_status()  
+                data = response.json()
+
+                for location, inverters in data.items():
+                    for inverter in inverters:
+                        try:
+                            registers_data = inverter.get("inverter_registers_data", {})
+                            current_power = float(registers_data["current_power"]["data"])
+                            today_energy = float(registers_data["today_generate_energy"]["data"])
+                            total_energy = float(registers_data["total_generate_energy"]["data"])
+                            serial_number = inverter['serial_number']
+                            status = ''
+
+                            if serial_number != "All":
+                                status = registers_data.get('status', 'Unknown')  # Если статус отсутствует, ставим "Unknown"
+                                total_current_power += current_power
+                                total_today_generate_energy += today_energy
+                                total_generate_energy += total_energy
+                            
+                            all_data.append({
+                                "location": location,
+                                'serial_number': serial_number,
+                                "current_power": current_power,
+                                "today_generate_energy": today_energy,
+                                "total_generate_energy": total_energy,
+                                "status": status,
+                            })
+                        except (KeyError, ValueError, TypeError) as e:
+                            print(f"Error processing inverter data from {url}: {e}")
+
+                print("Processed data from:", url)
+            except requests.exceptions.Timeout:
+                print(f"Timeout error: {url} did not respond in time.")
+            except requests.exceptions.ConnectionError:
+                print(f"Connection error: Could not connect to {url}.")
+            except requests.exceptions.HTTPError as e:
+                print(f"HTTP error: {url} returned {e.response.status_code}.")
+            except requests.exceptions.RequestException as e:
+                print(f"RequestException: {url} encountered an error: {e}")
+            except json.JSONDecodeError:
+                print(f"JSON decode error: Could not parse response from {url}.")
+
+    # Форматируем итоговые данные
+    formatted_total_today_energy = round(total_today_generate_energy, 2)
+    formatted_total_generate_energy = round(total_generate_energy, 2)
+    formatted_total_current_power = round(total_current_power / 1000, 2)
+
+    context = {
+        'total_power': formatted_total_power,
+        'total_today_generate_energy': formatted_total_today_energy,
+        'total_generate_energy': formatted_total_generate_energy / 1000,
+        'total_current_power': formatted_total_current_power,
+        'plants': plants,
+        'plants_json': plants_json,
+        'all_data': all_data,
+        'inverters': Inverter.objects.all()
+    }
+    return render(request, 'index.html', context)
+
+
+def plants_view(request):
+    context = {
+        'plants': Plant.objects.all(),
+    }
+    return render(request, 'plants.html', context)
+
+
+# Define a mapping of plant addresses to API URLs
+API_URLS = {
+    "JSC_TPP": 'http://10.20.6.30:8080',
+    "TASHKENT_TTC": 'http://10.20.96.35:8080',
+    "SIRDARYA_TPP": 'http://10.28.28.50:8080',
+    "MUBAREK_TPP": 'http://10.20.77.30:8080',
+    "FERGANA_TPC": 'http://10.20.45.30:8080'
+}
+
+def fetch_inverter_data(api_base_url):
+    """Fetch inverter data from the specified API base URL."""
+    try:
+        inverter_response = requests.get(f'{api_base_url}/inverter/')
+        inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+    except requests.RequestException as e:
+        return []
+
+    inverters_data = []
+    for inverter in inverters:
+        serial_number = inverter['serial_number']
+        try:
+            data_response = requests.get(f'{api_base_url}/data/last/{serial_number}')
+            data = data_response.json() if data_response.status_code == 200 else {}
+            inverter_data = {
+                'serial_number': serial_number,
+                'data': data.get('inverter_registers_data', {})
+            }
+        except requests.RequestException as e:
+            inverter_data = {'serial_number': serial_number, 'data': {}}
+
+        inverters_data.append(inverter_data)
+
+    return inverters_data
+
+
+def plant_detail(request, pk):
+    plant = get_object_or_404(Plant, pk=pk)
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
+    api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
+
+    inverter_response = requests.get(f'{api_base_url}/inverter/')
+    inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+
+    modal_response = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}')
+    modal_info = modal_response.json() if modal_response.status_code == 200 else []
+
+    inverters_data = []
+    for inverter in inverters:
+        serial_number = inverter['serial_number']
+        data_response = requests.get(f'{api_base_url}/data/last/{serial_number}')
+        inverter_data = {'serial_number': serial_number, 'data': {}}
+        
+        if data_response.status_code == 200:
+            data = data_response.json()
+            if data and 'inverter_registers_data' in data:
+                inverter_data['data'] = data['inverter_registers_data']
+        
+        inverters_data.append(inverter_data)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            selected_date = body.get('selected_date')
+            if selected_date:
+                date_parts = selected_date.split('-')
+                if len(date_parts) == 3:  
+                    chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
+                    chart_response = requests.get(chart_api_url)
+
+                    if chart_response.status_code == 200:
+                        chart_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'chartData': chart_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch daily chart data.'
+                        }
+                elif len(date_parts) == 2: 
+
+                    year, month = date_parts
+                    month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
+                    chart_response = requests.get(month_api_url)
+                    if chart_response.status_code == 200:
+                        month_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'monthData': month_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch monthly chart data.'
+                        }
+                else:
+                    response_data = {
+                        'status': 'error',
+                        'message': 'Invalid date format. Please use YYYY-MM-DD or YYYY/MM.'
+                    }
+            else:
+                response_data = {
+                    'status': 'error',
+                    'message': 'No date provided.'
+                }
+
+            return JsonResponse(response_data)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    context = {
+        "inverters": inverters,
+        'inverters_data': inverters_data,
+        'plant': plant,
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url,  
+        'modal_info': json.dumps(modal_info)
+    }
+    
+    return render(request, 'plant_detail.html', context)  
+
+def plant_view(request):
+    context = {
+        'plants': Plant.objects.all(),
+    }
+
+    return render(request, 'plants.html', context)
+
+def inverter_view(request, serial_number):
+    today_date = datetime.today().strftime('%Y-%m-%d')
+
+    inverter = get_object_or_404(Inverter, serial=serial_number)
+
+    if inverter.plant.address == "JSC_TPP":
+        api_base_url = 'http://10.20.6.30:8080'
+    elif inverter.plant.address == "TASHKENT_TTC":
+        api_base_url = 'http://10.20.96.35:8080'
+    elif inverter.plant.address == "SIRDARYA_TPP":
+        api_base_url = 'http://10.28.28.50:8080'
+    elif inverter.plant.address == "MUBAREK_TPP":
+        api_base_url = 'http://10.20.77.30:8080'
+    elif inverter.plant.address == "FERGANA_TPC":
+        api_base_url = 'http://10.20.6.60:8080/'
+    else:
+        api_base_url = 'http://10.20.6.30:8080/'
+    # Fetch inverters data from API
+    inverters, redirect_view = fetch_data_from_api(f'{api_base_url}/inverter/')
+    if redirect_view:
+        return redirect(redirect_view)
+    
+    if not inverters:
+        return render(request, 'error.html', {'message': 'Failed to retrieve inverter data.'})
+
+    inverter_data = next((inv for inv in inverters if inv['serial_number'] == serial_number), None)
+    if not inverter_data:
+        return render(request, 'error.html', {'message': 'Inverter not found in API data.'})
+
+    last_data, _ = fetch_data_from_api(f'{api_base_url}/data/last/{serial_number}')
+
+    if last_data:
+        last_data.update({
+            'name': inverter_data.get('name'),
+            'registers': inverter_data.get('registers')
+        })
+
+    # check if the serial number exists in the local database
+    local_inverter = Inverter.objects.filter(serial=serial_number).first()
+    info = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}').json()
+    context = {
+        'modal_info': info,
+        'inverter': last_data,
+        'info': local_inverter,  
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url
+    }
+    return render(request, 'inverter.html', context)
+
+def custom_404(request, exception):
+    return render(request, "404.html", status=404)
+
+handler404 = custom_404
+
+
+def create_plant(request):
+    if request.method == 'POST':
+        form = PlantForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('plants'))  
+    else:
+        form = PlantForm()
+
+    return render(request, 'plant_create.html', {'form': form})
+
+
+def edit_plant(request, plant_id):
+    plant = get_object_or_404(Plant, id=plant_id)
+    
+    if request.method == 'POST':
+        form = PlantForm(request.POST, request.FILES, instance=plant)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('plants'))  
+    else:
+        form = PlantForm(instance=plant)
+    
+    return render(request, 'plant_edit.html', {'form': form, 'plant': plant})
+
+
+
+def panel_view(request):
+    total_power = Plant.objects.aggregate(total=Sum('power'))['total'] or 0
+    formatted_total_power = round(float(total_power), 2)  
+
+    plants = list(Plant.objects.values('id', 'name', 'inverter_count', 'latitude', 'longitude', 'power', 'image', 'address'))
+    
+    for plant in plants:
+        plant['power'] = float(plant['power']) 
+    
+    plants_json = json.dumps(plants)
+
+    api_urls = [
+        "http://10.20.6.30:8080/data/chart/last/all/",
+        "http://10.20.96.35:8080/data/chart/last/all/",
+        "http://10.28.28.50:8080/data/chart/last/all/",
+        'http://10.20.77.30:8080/data/chart/last/all/'
+        'http://10.20.45.30:8080/data/chart/last/all/'
+    ]
+
+    
+    total_today_generate_energy = 0
+    total_generate_energy = 0
+    total_current_power = 0
+    all_data = []
+
+    for url in api_urls:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise exception for HTTP errors
+            data = response.json()
+
+            # Combine processing for summing and storing location data
+            for location, inverters in data.items():
+                for inverter in inverters:
+                        registers_data = inverter.get("inverter_registers_data", {})
+                        current_power = float(registers_data["current_power"]["data"])
+                        today_energy = float(registers_data["today_generate_energy"]["data"])
+                        total_energy = float(registers_data["total_generate_energy"]["data"])
+                        serial_number = inverter['serial_number']
+                        status = ''
+                        if inverter['serial_number'] != "All":
+                            status = registers_data['status']
+                            # Accumulate totals
+                            total_current_power += current_power
+                            total_today_generate_energy += today_energy
+                            total_generate_energy += total_energy
+                        
+                        # Store location and inverter data
+                        all_data.append({
+                            "location": location,
+                            'serial_number' : serial_number,
+                            "current_power": current_power,
+                            "today_generate_energy": today_energy,
+                            "total_generate_energy": total_energy,
+                            "status": status,
+                        })
+
+            print("Processed data from:", url)
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data from {url}: {e}")
+        except KeyError as e:
+            print(f"KeyError when parsing data from {url}: {e}")
+        except ValueError as e:
+            print(f"ValueError when processing data from {url}: {e}")  
+
+
+    # Format the totals
+    formatted_total_today_energy = round(total_today_generate_energy, 2)
+    formatted_total_generate_energy = round(total_generate_energy, 2)
+    formatted_total_current_power = round(total_current_power/1000, 2)
+
+    # Context data to pass to the template
+    context = {
+        'total_power': formatted_total_power,
+        'total_today_generate_energy': formatted_total_today_energy,
+        'total_generate_energy': formatted_total_generate_energy / 1000,
+        'total_current_power': formatted_total_current_power,
+        'plants': plants,
+        'plants_grid': Plant.objects.all(),
+        'plants_json': plants_json,
+        'all_data': all_data,
+        'inverters': Inverter.objects.all()
+    }
+    return render(request, 'panel.html', context)
+
+def plants_view(request):
+    context = {
+        'plants': Plant.objects.all(),
+    }
+    return render(request, 'plants.html', context)
+
+def panel_detail(request, pk):
+    plant = get_object_or_404(Plant, pk=pk)
+    today_date = datetime.now().strftime('%Y-%m-%d')
+
+    api_base_url = API_URLS.get(plant.address, 'http://10.20.6.30:8080')
+
+    inverter_response = requests.get(f'{api_base_url}/inverter/')
+    inverters = inverter_response.json() if inverter_response.status_code == 200 else []
+
+    modal_response = requests.get(f'{api_base_url}/data/chart/day/all/{today_date}')
+    modal_info = modal_response.json() if modal_response.status_code == 200 else []
+
+    inverters_data = []
+    for inverter in inverters:
+        serial_number = inverter['serial_number']
+        data_response = requests.get(f'{api_base_url}/data/last/{serial_number}')
+        inverter_data = {'serial_number': serial_number, 'data': {}}
+        
+        if data_response.status_code == 200:
+            data = data_response.json()
+            if data and 'inverter_registers_data' in data:
+                inverter_data['data'] = data['inverter_registers_data']
+        
+        inverters_data.append(inverter_data)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            selected_date = body.get('selected_date')
+            if selected_date:
+                date_parts = selected_date.split('-')
+                if len(date_parts) == 3:  
+                    chart_api_url = f'{api_base_url}/data/chart/day/all/{selected_date}'
+                    chart_response = requests.get(chart_api_url)
+
+                    if chart_response.status_code == 200:
+                        chart_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'chartData': chart_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch daily chart data.'
+                        }
+                elif len(date_parts) == 2: 
+
+                    year, month = date_parts
+                    month_api_url = f'{api_base_url}/data/chart/month/all/{year}/{month}'
+                    chart_response = requests.get(month_api_url)
+                    if chart_response.status_code == 200:
+                        month_data = chart_response.json()
+                        response_data = {
+                            'status': 'success',
+                            'monthData': month_data
+                        }
+                    else:
+                        response_data = {
+                            'status': 'error',
+                            'message': 'Failed to fetch monthly chart data.'
+                        }
+                else:
+                    response_data = {
+                        'status': 'error',
+                        'message': 'Invalid date format. Please use YYYY-MM-DD or YYYY/MM.'
+                    }
+            else:
+                response_data = {
+                    'status': 'error',
+                    'message': 'No date provided.'
+                }
+
+            return JsonResponse(response_data)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    context = {
+        "inverters": inverters,
+        'inverters_data': inverters_data,
+        'plant': plant,
+        'plants': Plant.objects.all(),
+        'api_base_url': api_base_url,  
+        'modal_info': json.dumps(modal_info)
+    }
+    
+    return render(request, 'panel_detail.html', context)  
